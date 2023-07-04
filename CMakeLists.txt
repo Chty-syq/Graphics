@@ -10,11 +10,11 @@ add_subdirectory(third-party/glad)
 file(GLOB_RECURSE source_files CONFIGURE_DEPENDS src/*.cpp src/*.hpp)
 add_executable(${PROJECT_NAME} ${source_files})
 
-
 target_link_libraries(${PROJECT_NAME}
         glad
         glfw
         OpenGL::GL
+        ${CMAKE_DL_LIBS}
         )
 target_include_directories(${PROJECT_NAME} PUBLIC  # header-only package
         src
