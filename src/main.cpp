@@ -7,6 +7,7 @@
 #include "framework/sprites/square.hpp"
 #include "framework/sprites/cube.hpp"
 #include "framework/texture.hpp"
+#include "framework/camera.hpp"
 
 namespace fs = std::filesystem;
 
