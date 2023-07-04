@@ -9,6 +9,7 @@
 #include "framework/texture.hpp"
 #include "framework/camera.hpp"
 #include "common/defs.hpp"
+#include "common/utils.hpp"
 
 #define keydown(x) (glfwGetKey(window, x) == GLFW_PRESS)
 
@@ -71,6 +72,7 @@ void mouse_scroll_callback(GLFWwindow* window, double offset_x, double offset_y)
 
 
 int main() {
+    utils::SetCursorPosLinux(0, 0);
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
