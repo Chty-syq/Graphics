@@ -17,7 +17,7 @@ public:
     virtual ~BaseSprite() = default;
     virtual void LoadData() = 0;
     void LoadBuffer();
-    void Draw(glm::vec3 position, glm::vec3 size, glm::vec3 rotate);
+    void Draw(glm::vec3 position, glm::vec3 size = glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3 rotate = glm::vec3(0.0f, 0.0f, 0.0f));
 };
 
 BaseSprite::BaseSprite(Shader shader) : shader(shader) {}

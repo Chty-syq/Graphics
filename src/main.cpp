@@ -4,7 +4,7 @@
 #include <iostream>
 #include <filesystem>
 #include "framework/shader.hpp"
-#include "framework/sprites/square.hpp"
+#include "framework/sprites/floor.hpp"
 #include "framework/sprites/cube.hpp"
 #include "framework/texture.hpp"
 #include "framework/camera.hpp"
@@ -33,8 +33,9 @@ void display() {
     shader.SetAttribute("projection", projection);
 
     Cube cube(shader);
-    Texture2D texture(fs::current_path().parent_path() / "assets" / "container.jpg");
+    Floor floor(shader);
 
+    Texture2D texture(fs::current_path().parent_path() / "assets" / "textures" / "container.jpg");
     texture.Use();
 
     cube.LoadData();
@@ -44,6 +45,13 @@ void display() {
             glm::vec3(1.0f, 1.0f, 1.0f),
             glm::vec3(glm::radians(50.0f) * glfwGetTime(), glm::radians(50.0f) * glfwGetTime(), 0.0f)
             );
+
+    Texture2D floor_tex(fs::current_path().parent_path() / "assets" / "textures" / "floor.jpg");
+    floor_tex.Use();
+
+    floor.LoadData();
+    floor.LoadBuffer();
+    floor.Draw(glm::vec3(0.0f, 0.0f, 0.0f));
 }
 
 void keyboard_input(GLFWwindow* window) {
