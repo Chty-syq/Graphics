@@ -117,6 +117,10 @@ void GraphScene::Display() {
     normal_shader->SetAttribute("fLightPos", camera->GetPosition());
     normal_shader->SetAttribute("fLightColor", glm::vec3(1.0f, 1.0f, 1.0f));
     normal_shader->SetAttribute("fViewPos", camera->GetPosition());
+    normal_shader->SetAttribute("material.mAmbient", glm::vec3( 0.19225,0.19225,0.19225));
+    normal_shader->SetAttribute("material.mDiffuse", glm::vec3(0.50754 ,0.50754, 0.50754));
+    normal_shader->SetAttribute("material.mSpecular", glm::vec3(0.508273, 0.508273 ,0.508273));
+    normal_shader->SetAttribute("material.mShininess", 0.4 * 128);
 
     Cube cube(normal_shader);
     Floor floor(normal_shader);
@@ -126,7 +130,7 @@ void GraphScene::Display() {
 
     cube.LoadData();
     cube.LoadBuffer();
-    cube.Draw(glm::vec3(0.0f, 1.0f, 0.0f));
+    cube.Draw(glm::vec3(0.0f, 0.5f, 0.0f));
 
     Texture2D floor_tex(fs::current_path().parent_path() / "assets" / "textures" / "floor.jpg");
     floor_tex.Use();
