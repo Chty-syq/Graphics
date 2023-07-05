@@ -25,6 +25,7 @@ public:
     explicit Camera(glm::vec3 camera_pos);
     auto GetViewMat();
     auto GetZoom() const;
+    auto GetPosition() const;
     void KeyboardInput(Direction direction, float duration);
     void MouseMove(float offset_x, float offset_y);
     void MouseScroll(float offset);
@@ -85,6 +86,10 @@ auto Camera::GetViewMat() {
 
 auto Camera::GetZoom() const {
     return this->zoom;
+}
+
+auto Camera::GetPosition() const {
+    return this->camera_pos;
 }
 
 

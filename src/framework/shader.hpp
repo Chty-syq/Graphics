@@ -23,7 +23,8 @@ public:
     explicit Shader(const std::string& path);
     ~Shader() = default;
     void Use() const;
-    void SetAttribute(const std::string &name, const glm::mat4 &mat) const;
+    void SetAttribute(const std::string &name, const glm::vec3 &value) const;
+    void SetAttribute(const std::string &name, const glm::mat4 &value) const;
 };
 
 Shader::Shader(const std::string& path) {
@@ -90,8 +91,15 @@ void Shader::Use() const {
     glUseProgram(this->program);
 }
 
-void Shader::SetAttribute(const std::string &name, const glm::mat4 &mat) const {
+void Shader::SetAttribute(const std::string &name, const glm::vec3 &value) const {
     auto location = glGetUniformLocation(program, name.c_str());
-    glUniformMatrix4fv(location, 1, GL_FALSE, &mat[0][0]);
+    glUniform3f(location, value.x, value.y, value.z);
 }
+
+void Shader::SetAttribute(const std::string &name, const glm::mat4 &value) const {
+    auto location = glGetUniformLocation(program, name.c_str());
+    glUniformMatrix4fv(location, 1, GL_FALSE, &value[0][0]);
+}
+
+
 

@@ -7,10 +7,14 @@
 #include <iostream>
 #include <vector>
 
+namespace fs = std::filesystem;
+
 using std::cin;
 using std::cout;
 using std::endl;
 using std::vector;
+using std::unique_ptr;
+using std::shared_ptr;
 
 using GLfloatVec = std::vector<GLfloat>;
 using GLuintVec = std::vector<GLuint>;

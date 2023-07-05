@@ -5,22 +5,23 @@
 #include <GLFW/glfw3.h>
 #include "framework/shader.hpp"
 #include <common/defs.hpp>
+#include <utility>
 
 class BaseSprite {
 protected:
-    Shader shader;
+    shared_ptr<Shader> shader;
     GLfloatVec vertices;
     GLuintVec indices;
     GLuint vao{}, vbo{}, ebo{};
 public:
-    explicit BaseSprite(Shader shader);
+    explicit BaseSprite(shared_ptr<Shader>& shader);
     virtual ~BaseSprite() = default;
     virtual void LoadData() = 0;
     void LoadBuffer();
     void Draw(glm::vec3 position, glm::vec3 size = glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3 rotate = glm::vec3(0.0f, 0.0f, 0.0f));
 };
 
-BaseSprite::BaseSprite(Shader shader) : shader(shader) {}
+BaseSprite::BaseSprite(shared_ptr<Shader>& shader) : shader(shader) {}
 
 void BaseSprite::LoadBuffer() {
     glGenVertexArrays(1, &vao);
@@ -38,8 +39,8 @@ void BaseSprite::LoadBuffer() {
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (void*)(3 * sizeof(float)));
     glEnableVertexAttribArray(1);
-//    glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(5 * sizeof(float)));
-//    glEnableVertexAttribArray(2);
+    glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (void*)(5 * sizeof(float)));
+    glEnableVertexAttribArray(2);
     glBindVertexArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
@@ -52,8 +53,8 @@ void BaseSprite::Draw(glm::vec3 position, glm::vec3 size, glm::vec3 rotate) {
     model = glm::rotate(model, rotate[2], glm::vec3(0.0f, 0.0f, 1.0f));
     model = glm::scale(model, size);
 
-    this->shader.Use();
-    this->shader.SetAttribute("model", model);
+    this->shader->Use();
+    this->shader->SetAttribute("model", model);
 
     glBindVertexArray(this->vao);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->ebo);

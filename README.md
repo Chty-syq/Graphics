@@ -1,7 +1,5 @@
 # Graphic
 
----
-
 ## 1. Environment
 
 ### Ubuntu Linux

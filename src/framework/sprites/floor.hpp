@@ -3,11 +3,13 @@
 //
 
 #pragma once
+#include <utility>
+
 #include "framework/sprites/base.hpp"
 
 class Floor: public BaseSprite {
 public:
-    explicit Floor(Shader shader);
+    explicit Floor(shared_ptr<Shader>& shader);
     ~Floor() override = default;
     void LoadData() override;
 };
@@ -23,4 +25,4 @@ void Floor::LoadData() {
     this->indices = { 0,1,2,0,1,3 };
 }
 
-Floor::Floor(Shader shader) : BaseSprite(shader) {}
+Floor::Floor(shared_ptr<Shader>& shader) : BaseSprite(shader) {}

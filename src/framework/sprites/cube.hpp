@@ -3,15 +3,16 @@
 //
 #pragma once
 #include <framework/sprites/base.hpp>
+#include <utility>
 
 class Cube: public BaseSprite {
 public:
-    explicit Cube(Shader shader);
+    explicit Cube(shared_ptr<Shader>& shader);
     ~Cube() override = default;
     void LoadData() override;
 };
 
-Cube::Cube(Shader shader) : BaseSprite(shader) {}
+Cube::Cube(shared_ptr<Shader>& shader) : BaseSprite(shader) {}
 
 void Cube::LoadData() {
     this->vertices = {

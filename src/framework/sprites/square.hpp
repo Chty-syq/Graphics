@@ -6,18 +6,21 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <utility>
 #include <vector>
+#include <memory>
 #include "framework/shader.hpp"
 #include "framework/sprites/base.hpp"
+#include "common/defs.hpp"
 
 class Square: public BaseSprite {
 public:
-    explicit Square(Shader shader);
+    explicit Square(shared_ptr<Shader>& shader);
     ~Square() override = default;
     void LoadData() override;
 };
 
-Square::Square(Shader shader): BaseSprite(shader) {}
+Square::Square(shared_ptr<Shader>& shader): BaseSprite(shader) {}
 
 void Square::LoadData() {
     this->vertices = {
