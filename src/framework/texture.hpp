@@ -18,7 +18,7 @@ private:
 public:
     explicit Texture2D(const std::string& path);
     ~Texture2D();
-    void Use() const;
+    void Bind(int index) const;
 };
 
 Texture2D::Texture2D(const std::string& path): path(path) {
@@ -53,8 +53,8 @@ Texture2D::~Texture2D() {
     glDeleteTextures(1, &this->id);
 }
 
-void Texture2D::Use() const {
-    glActiveTexture(GL_TEXTURE0);
+void Texture2D::Bind(int index) const {
+    glActiveTexture(GL_TEXTURE0 + index);
     glBindTexture(GL_TEXTURE_2D, this->id);
 }
 

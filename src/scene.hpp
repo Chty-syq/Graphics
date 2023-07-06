@@ -11,6 +11,7 @@
 #include "framework/shader.hpp"
 #include "framework/sprites/floor.hpp"
 #include "framework/sprites/cube.hpp"
+#include "framework/sprites/mesh.hpp"
 #include "framework/texture.hpp"
 #include "framework/camera.hpp"
 #include "common/defs.hpp"
@@ -75,6 +76,40 @@ GraphScene::~GraphScene() {
 
 void GraphScene::LoadResource() {
     this->normal_shader = std::make_shared<Shader>(fs::current_path().parent_path() / "shaders" / "normal");
+    this->normal_shader->Use();
+    normal_shader->SetAttribute("material.mDiffuse", 0);
+    normal_shader->SetAttribute("material.mSpecular", 1);
+    normal_shader->SetAttribute("material.mShininess", 0.4f * 128);
+    normal_shader->SetAttribute("fLightParal.pDirection", glm::vec3(-0.2f, -1.0f, -0.3f));
+    normal_shader->SetAttribute("fLightParal.pFactor.fAmbient", glm::vec3(0.05f, 0.05f, 0.05f));
+    normal_shader->SetAttribute("fLightParal.pFactor.fDiffuse", glm::vec3(0.4f, 0.4f, 0.4f));
+    normal_shader->SetAttribute("fLightParal.pFactor.fSpecular", glm::vec3(0.5f, 0.5f, 0.5f));
+    normal_shader->SetAttribute("fLightPoint[0].pPosition", glm::vec3(0.7f,  0.2f,  2.0f));
+    normal_shader->SetAttribute("fLightPoint[0].pCoefficient", glm::vec3(1.0f, 0.09f, 0.032f));
+    normal_shader->SetAttribute("fLightPoint[0].pFactor.fAmbient", glm::vec3(0.05f, 0.05f, 0.05f));
+    normal_shader->SetAttribute("fLightPoint[0].pFactor.fDiffuse", glm::vec3(0.8f, 0.8f, 0.8f));
+    normal_shader->SetAttribute("fLightPoint[0].pFactor.fSpecular", glm::vec3(1.0f, 1.0f, 1.0f));
+    normal_shader->SetAttribute("fLightPoint[1].pPosition", glm::vec3(2.3f, -3.3f, -4.0f));
+    normal_shader->SetAttribute("fLightPoint[1].pCoefficient", glm::vec3(1.0f, 0.09f, 0.032f));
+    normal_shader->SetAttribute("fLightPoint[1].pFactor.fAmbient", glm::vec3(0.05f, 0.05f, 0.05f));
+    normal_shader->SetAttribute("fLightPoint[1].pFactor.fDiffuse", glm::vec3(0.8f, 0.8f, 0.8f));
+    normal_shader->SetAttribute("fLightPoint[1].pFactor.fSpecular", glm::vec3(1.0f, 1.0f, 1.0f));
+    normal_shader->SetAttribute("fLightPoint[2].pPosition", glm::vec3(-4.0f,  2.0f, -12.0f));
+    normal_shader->SetAttribute("fLightPoint[2].pCoefficient", glm::vec3(1.0f, 0.09f, 0.032f));
+    normal_shader->SetAttribute("fLightPoint[2].pFactor.fAmbient", glm::vec3(0.05f, 0.05f, 0.05f));
+    normal_shader->SetAttribute("fLightPoint[2].pFactor.fDiffuse", glm::vec3(0.8f, 0.8f, 0.8f));
+    normal_shader->SetAttribute("fLightPoint[2].pFactor.fSpecular", glm::vec3(1.0f, 1.0f, 1.0f));
+    normal_shader->SetAttribute("fLightPoint[3].pPosition", glm::vec3(0.0f,  0.0f, -3.0f));
+    normal_shader->SetAttribute("fLightPoint[3].pCoefficient", glm::vec3(1.0f, 0.09f, 0.032f));
+    normal_shader->SetAttribute("fLightPoint[3].pFactor.fAmbient", glm::vec3(0.05f, 0.05f, 0.05f));
+    normal_shader->SetAttribute("fLightPoint[3].pFactor.fDiffuse", glm::vec3(0.8f, 0.8f, 0.8f));
+    normal_shader->SetAttribute("fLightPoint[3].pFactor.fSpecular", glm::vec3(1.0f, 1.0f, 1.0f));
+    normal_shader->SetAttribute("fLightSpot.sCutoffInner", glm::cos(glm::radians(12.5f)));
+    normal_shader->SetAttribute("fLightSpot.sCutoffOuter", glm::cos(glm::radians(17.5f)));
+    normal_shader->SetAttribute("fLightSpot.sLightPoint.pCoefficient", glm::vec3(1.0f, 0.09f, 0.032f));
+    normal_shader->SetAttribute("fLightSpot.sLightPoint.pFactor.fAmbient", glm::vec3(0.0f, 0.0f, 0.0f));
+    normal_shader->SetAttribute("fLightSpot.sLightPoint.pFactor.fDiffuse", glm::vec3(1.0f, 1.0f, 1.0f));
+    normal_shader->SetAttribute("fLightSpot.sLightPoint.pFactor.fSpecular", glm::vec3(1.0f, 1.0f, 1.0f));
 }
 
 
@@ -114,26 +149,23 @@ void GraphScene::Display() {
     auto projection = glm::perspective(glm::radians(camera->GetZoom()), (GLfloat)SCREEN_WIDTH / (GLfloat)SCREEN_HEIGHT, 0.1f, 100.0f);
     normal_shader->SetAttribute("view", view);
     normal_shader->SetAttribute("projection", projection);
-    normal_shader->SetAttribute("fLightPos", camera->GetPosition());
-    normal_shader->SetAttribute("fLightColor", glm::vec3(1.0f, 1.0f, 1.0f));
-    normal_shader->SetAttribute("fViewPos", camera->GetPosition());
-    normal_shader->SetAttribute("material.mAmbient", glm::vec3( 0.19225,0.19225,0.19225));
-    normal_shader->SetAttribute("material.mDiffuse", glm::vec3(0.50754 ,0.50754, 0.50754));
-    normal_shader->SetAttribute("material.mSpecular", glm::vec3(0.508273, 0.508273 ,0.508273));
-    normal_shader->SetAttribute("material.mShininess", 0.4 * 128);
+    normal_shader->SetAttribute("fLightSpot.sDirection", camera->GetFront());
+    normal_shader->SetAttribute("fLightSpot.sLightPoint.pPosition", camera->GetPosition());
 
     Cube cube(normal_shader);
     Floor floor(normal_shader);
 
-    Texture2D texture(fs::current_path().parent_path() / "assets" / "textures" / "container.jpg");
-    texture.Use();
+    Texture2D container(fs::current_path().parent_path() / "assets" / "textures" / "container.jpg");
+    Texture2D container_spec(fs::current_path().parent_path() / "assets" / "textures" / "container_spec.png");
+    container.Bind(0);
+    container_spec.Bind(1);
 
     cube.LoadData();
     cube.LoadBuffer();
     cube.Draw(glm::vec3(0.0f, 0.5f, 0.0f));
 
     Texture2D floor_tex(fs::current_path().parent_path() / "assets" / "textures" / "floor.jpg");
-    floor_tex.Use();
+    floor_tex.Bind(0);
 
     floor.LoadData();
     floor.LoadBuffer();

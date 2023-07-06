@@ -26,6 +26,7 @@ public:
     auto GetViewMat();
     auto GetZoom() const;
     auto GetPosition() const;
+    auto GetFront() const;
     void KeyboardInput(Direction direction, float duration);
     void MouseMove(float offset_x, float offset_y);
     void MouseScroll(float offset);
@@ -90,6 +91,10 @@ auto Camera::GetZoom() const {
 
 auto Camera::GetPosition() const {
     return this->camera_pos;
+}
+
+auto Camera::GetFront() const {
+    return this->camera_front;
 }
 
 
