@@ -6,7 +6,7 @@
 #include "scene/scene.hpp"
 
 int main() {
-    GraphScene scene;
-    scene.Render();
+    GraphScene::Init();
+    GraphScene::Render();
     return 0;
 }

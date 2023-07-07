@@ -20,62 +20,54 @@
 
 #define keydown(x) (glfwGetKey(window, x) == GLFW_PRESS)
 
-class GraphScene {
-private:
+namespace GraphScene {
     GLFWwindow* window;
     vector<shared_ptr<BaseSprite>> sprites;
     vector<shared_ptr<Model>> models;
+    unique_ptr<Camera> camera = std::make_unique<Camera>(glm::vec3(1.0f, 1.0f, 1.0f));
 
-    static float last_frame;
-    static unique_ptr<Camera> camera;
-    static double last_x;
-    static double last_y;
+    float last_frame = 0;
+    int window_pos_x;
+    int window_pos_y;
 
+    void Init();
     void LoadSceneObjects();
+
     void DrawSkybox();
     void Display();
 
-    static void KeyboardInput(GLFWwindow* window);
-    static void MouseMoveCallback(GLFWwindow* window, double pos_x, double pos_y);
-    static void MouseScrollCallback(GLFWwindow* window, double offset_x, double offset_y);
+    void KeyboardInput();
+    void MouseMoveCallback(GLFWwindow* window_, double pos_x, double pos_y);
+    void MouseScrollCallback(GLFWwindow* window_, double offset_x, double offset_y);
 
-public:
-    GraphScene();
-    ~GraphScene();
     void Render();
 };
 
-float GraphScene::last_frame = 0;
-double GraphScene::last_x = (SCREEN_WIDTH >> 1);
-double GraphScene::last_y = (SCREEN_HEIGHT >> 1);
-unique_ptr<Camera> GraphScene::camera = std::make_unique<Camera>(glm::vec3(1.0f, 1.0f, 1.0f));
-
-GraphScene::GraphScene() {
+void GraphScene::Init() {
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
 
-    this->window = glfwCreateWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "LearnOpenGL", nullptr, nullptr);
+    window = glfwCreateWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "LearnOpenGL", nullptr, nullptr);
     if (window == nullptr) {
         throw std::runtime_error("Unexpected Behavior Creating GLFW Window!");
     }
 
+    glfwGetWindowPos(window, &window_pos_x, &window_pos_y);
     glfwMakeContextCurrent(window);
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+
     glfwSetCursorPosCallback(window, MouseMoveCallback);
     glfwSetScrollCallback(window, MouseScrollCallback);
+
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
         throw std::runtime_error("Initialize GLAD Failed!");
     }
 
     ResourceManager::Init();
-    this->LoadSceneObjects();
-}
-
-GraphScene::~GraphScene() {
-    glfwTerminate();
+    LoadSceneObjects();
 }
 
 void GraphScene::LoadSceneObjects() {
@@ -90,7 +82,7 @@ void GraphScene::LoadSceneObjects() {
     models.push_back(klee);
 }
 
-void GraphScene::KeyboardInput(GLFWwindow* window) {
+void GraphScene::KeyboardInput() {
     auto cur_frame = (float)glfwGetTime();
     auto duration = cur_frame - last_frame;
     if (keydown(GLFW_KEY_W))  camera->KeyboardInput(Direction::forward, duration);
@@ -104,15 +96,16 @@ void GraphScene::KeyboardInput(GLFWwindow* window) {
     last_frame = cur_frame;
 }
 
-void GraphScene::MouseMoveCallback(GLFWwindow* window, double pos_x, double pos_y) {
-    double offset_x = pos_x - last_x;
-    double offset_y = last_y - pos_y;
+void GraphScene::MouseMoveCallback(GLFWwindow* window_, double pos_x, double pos_y) {
+    int center_pos_x = window_pos_x + (int)(SCREEN_WIDTH >> 1);
+    int center_pos_y = window_pos_y + (int)(SCREEN_HEIGHT >> 1);
+    double offset_x = pos_x - (SCREEN_WIDTH >> 1);
+    double offset_y = (SCREEN_HEIGHT >> 1) - pos_y;
     camera->MouseMove((float)offset_x, (float)offset_y);
-    last_x = pos_x;
-    last_y = pos_y;
+    utils::SetCursorPosLinux(center_pos_x, center_pos_y);
 }
 
-void GraphScene::MouseScrollCallback(GLFWwindow* window, double offset_x, double offset_y) {
+void GraphScene::MouseScrollCallback(GLFWwindow* window_, double offset_x, double offset_y) {
     camera->MouseScroll((float)offset_y);
 }
 
@@ -155,15 +148,16 @@ void GraphScene::Display() {
     floor.Draw(ResourceManager::shader_object, glm::vec3(0.0f, 0.0f, 0.0f));
 
     //this->models[0]->Draw(ResourceManager::shader_object, glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.1f));
-    this->models[1]->Draw(ResourceManager::shader_object, glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.1f));
+    models[1]->Draw(ResourceManager::shader_object, glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.1f));
 }
 
 void GraphScene::Render() {
     while(!glfwWindowShouldClose(window))
     {
         glfwPollEvents();
-        this->KeyboardInput(window);
-        this->Display();
+        KeyboardInput();
+        Display();
         glfwSwapBuffers(window);
     }
+    glfwTerminate();
 }

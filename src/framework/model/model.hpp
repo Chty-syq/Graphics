@@ -9,6 +9,7 @@
 #include <stdexcept>
 #include <string>
 #include <regex>
+#include <queue>
 #include "framework/sprites/base.hpp"
 #include "framework/texture.hpp"
 #include "framework/model/mesh.hpp"
@@ -19,7 +20,7 @@ class Model {
 private:
     std::string directory;
     vector<Mesh> meshes;
-    void ProcessNode(aiNode* node, const aiScene* scene);
+    void ProcessNode(aiNode* root, const aiScene* scene);
     void ProcessMesh(aiMesh* mesh, const aiScene* scene);
     std::string ProcessTexture(aiMaterial* material, aiTextureType type);
 public:
@@ -43,20 +44,25 @@ Model::Model(const std::string &path) {
     this->ProcessNode(scene->mRootNode, scene);
 }
 
-void Model::ProcessNode(aiNode *node, const aiScene *scene) {
-    for(int i = 0; i < node->mNumMeshes; ++i) {
-        auto mesh = scene->mMeshes[node->mMeshes[i]];
-        this->ProcessMesh(mesh, scene);
-    }
-    for(int i = 0; i < node->mNumChildren; ++i) {
-        this->ProcessNode(node->mChildren[i], scene);
+void Model::ProcessNode(aiNode *root, const aiScene *scene) { //bfs扫描结点树
+    std::queue<aiNode*> nodes_queue;
+    nodes_queue.push(root);
+    while(!nodes_queue.empty()) {
+        auto node = nodes_queue.front();
+        nodes_queue.pop();
+        for(int i = 0; i < node->mNumMeshes; ++i) {
+            auto mesh = scene->mMeshes[node->mMeshes[i]];
+            this->ProcessMesh(mesh, scene);
+        }
+        for(int i = 0; i < node->mNumChildren; ++i) {
+            nodes_queue.push(node->mChildren[i]);
+        }
     }
 }
 
 void Model::ProcessMesh(aiMesh *mesh, const aiScene *scene) {
     GLfloatVec vertices;
     GLuintVec indices;
-
     for(int i = 0; i < mesh->mNumVertices; ++i) {
         auto position = mesh->mVertices[i];
         auto normal = mesh->mNormals[i];
