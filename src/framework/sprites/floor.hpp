@@ -9,7 +9,7 @@
 
 class Floor: public BaseSprite {
 public:
-    explicit Floor(shared_ptr<Shader>& shader);
+    using BaseSprite::BaseSprite;
     ~Floor() override = default;
     void LoadData() override;
 };
@@ -24,5 +24,3 @@ void Floor::LoadData() {
     };
     this->indices = { 0,1,2,0,1,3 };
 }
-
-Floor::Floor(shared_ptr<Shader>& shader) : BaseSprite(shader) {}

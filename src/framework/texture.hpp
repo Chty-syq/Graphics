@@ -30,23 +30,27 @@ Texture2D::Texture2D(const std::string& path): path(path) {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-    int width, height, channels;
+    int width = 50, height = 50, channels;
+    stbi_set_flip_vertically_on_load(true);
     auto bytes = stbi_load(path.c_str(), &width, &height, &channels, 0);
-    if (bytes == nullptr) {
-        throw std::runtime_error("Load image failed!");
+    if (bytes == nullptr) { //空纹理
+        std::vector<GLubyte> empty_data(width * height * 4, 0);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, &empty_data[0]);
+        glGenerateMipmap(GL_TEXTURE_2D);
+        glBindTexture(GL_TEXTURE_2D, 0);
+    } else {
+        GLenum format;
+        switch (channels) {
+            case 1: format = GL_RED; break;
+            case 3: format = GL_RGB; break;
+            case 4: format = GL_RGBA; break;
+            default: throw std::runtime_error("Unexpected channels!");
+        }
+        glTexImage2D(GL_TEXTURE_2D, 0, (int)format, width, height, 0, format, GL_UNSIGNED_BYTE, bytes);
+        glGenerateMipmap(GL_TEXTURE_2D);
+        glBindTexture(GL_TEXTURE_2D, 0);
+        stbi_image_free(bytes);
     }
-
-    GLenum format;
-    switch (channels) {
-        case 1: format = GL_RED; break;
-        case 3: format = GL_RGB; break;
-        case 4: format = GL_RGBA; break;
-        default: throw std::runtime_error("Unexpected channels!");
-    }
-    glTexImage2D(GL_TEXTURE_2D, 0, (int)format, width, height, 0, format, GL_UNSIGNED_BYTE, bytes);
-    glGenerateMipmap(GL_TEXTURE_2D);
-    glBindTexture(GL_TEXTURE_2D, 0);
-    stbi_image_free(bytes);
 }
 
 Texture2D::~Texture2D() {
@@ -57,5 +61,3 @@ void Texture2D::Bind(int index) const {
     glActiveTexture(GL_TEXTURE0 + index);
     glBindTexture(GL_TEXTURE_2D, this->id);
 }
-
-

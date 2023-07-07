@@ -10,23 +10,29 @@
 #include <string>
 #include "framework/sprites/base.hpp"
 #include "framework/texture.hpp"
+#include "framework/model/mesh.hpp"
+#include "scene/resources.hpp"
 #include "common/defs.hpp"
 
 class Model {
 private:
     std::string directory;
-    Texture2D diffuse_map;
-    Texture2D specular_map;
-    void LoadModel(const std::string& path);
+    vector<Mesh> meshes;
     void ProcessNode(aiNode* node, const aiScene* scene);
     void ProcessMesh(aiMesh* mesh, const aiScene* scene);
-    Texture2D ProcessTexture(aiMaterial* material, aiTextureType type);
+    std::string ProcessTexture(aiMaterial* material, aiTextureType type);
 public:
-    Model(const std::string& path);
+    explicit Model(const std::string &path);
+    ~Model() = default;
+    void Draw(
+        shared_ptr<Shader>& shader,
+        glm::vec3 position,
+        glm::vec3 size = glm::vec3(1.0f, 1.0f, 1.0f),
+        glm::vec3 rotate = glm::vec3(0.0f, 0.0f, 0.0f)
+    );
 };
 
-
-void Model::LoadModel(const std::string& path) {
+Model::Model(const std::string &path) {
     Assimp::Importer importer;
     auto scene = importer.ReadFile(path, aiProcess_Triangulate);
     if (!scene || !scene->mRootNode || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE) {
@@ -39,6 +45,7 @@ void Model::LoadModel(const std::string& path) {
 void Model::ProcessNode(aiNode *node, const aiScene *scene) {
     for(int i = 0; i < node->mNumMeshes; ++i) {
         auto mesh = scene->mMeshes[node->mMeshes[i]];
+        this->ProcessMesh(mesh, scene);
     }
     for(int i = 0; i < node->mNumChildren; ++i) {
         this->ProcessNode(node->mChildren[i], scene);
@@ -62,18 +69,30 @@ void Model::ProcessMesh(aiMesh *mesh, const aiScene *scene) {
             indices.push_back(face.mIndices[k]);
         }
     }
+    std::string diffuse_map = "empty";
+    std::string specular_map = "empty";
     if(mesh->mMaterialIndex >= 0) {
         auto material = scene->mMaterials[mesh->mMaterialIndex];
-        this->diffuse_map = this->ProcessTexture(material, aiTextureType_DIFFUSE);
-        this->specular_map = this->ProcessTexture(material, aiTextureType_SPECULAR);
+        diffuse_map = this->ProcessTexture(material, aiTextureType_DIFFUSE);
+        specular_map = this->ProcessTexture(material, aiTextureType_SPECULAR);
     }
+    this->meshes.emplace_back(vertices, indices, diffuse_map, specular_map);
 }
 
-Texture2D Model::ProcessTexture(aiMaterial* material, aiTextureType type) {
+std::string Model::ProcessTexture(aiMaterial* material, aiTextureType type) {
     for(int i = 0; i < material->GetTextureCount(type); ++i) {
         aiString str;
         material->GetTexture(type, i, &str);
-        Texture2D texture(directory + "/" + str.C_Str());
-        return texture;
+        auto path = fs::path(directory + "/" + str.C_Str());
+        ResourceManager::LoadTexture(path);
+        return path.stem().string();
+    }
+    return "empty";
+}
+
+void Model::Draw(shared_ptr<Shader>& shader, glm::vec3 position, glm::vec3 size, glm::vec3 rotate) {
+    for(auto &mesh : this->meshes) {
+        mesh.LoadBuffer();
+        mesh.Draw(shader, position, size, rotate);
     }
 }

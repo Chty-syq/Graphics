@@ -3,7 +3,7 @@
 #include <GLFW/glfw3.h>
 #include <iostream>
 #include <filesystem>
-#include "scene.hpp"
+#include "scene/scene.hpp"
 
 int main() {
     GraphScene scene;

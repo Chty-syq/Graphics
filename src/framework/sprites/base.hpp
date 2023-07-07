@@ -4,24 +4,40 @@
 #pragma once
 #include <GLFW/glfw3.h>
 #include "framework/shader.hpp"
+#include "scene/resources.hpp"
 #include <common/defs.hpp>
 #include <utility>
 
 class BaseSprite {
 protected:
-    shared_ptr<Shader> shader;
     GLfloatVec vertices;
     GLuintVec indices;
     GLuint vao{}, vbo{}, ebo{};
+    std::string diffuse_map = "empty";
+    std::string specular_map = "empty";
 public:
-    explicit BaseSprite(shared_ptr<Shader>& shader);
+    BaseSprite() = default;
+    explicit BaseSprite(const std::string &diffuse_map);
+    BaseSprite(const std::string &diffuse_map, const std::string &specular_map);
     virtual ~BaseSprite() = default;
     virtual void LoadData() = 0;
     void LoadBuffer();
-    void Draw(glm::vec3 position, glm::vec3 size = glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3 rotate = glm::vec3(0.0f, 0.0f, 0.0f));
+    void Draw(
+        shared_ptr<Shader>& shader,
+        glm::vec3 position,
+        glm::vec3 size = glm::vec3(1.0f, 1.0f, 1.0f),
+        glm::vec3 rotate = glm::vec3(0.0f, 0.0f, 0.0f)
+    );
 };
 
-BaseSprite::BaseSprite(shared_ptr<Shader>& shader) : shader(shader) {}
+BaseSprite::BaseSprite(const std::string &diffuse_map) {
+    this->diffuse_map = diffuse_map;
+}
+
+BaseSprite::BaseSprite(const std::string &diffuse_map, const std::string &specular_map) {
+    this->diffuse_map = diffuse_map;
+    this->specular_map = specular_map;
+}
 
 void BaseSprite::LoadBuffer() {
     glGenVertexArrays(1, &vao);
@@ -45,7 +61,7 @@ void BaseSprite::LoadBuffer() {
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
-void BaseSprite::Draw(glm::vec3 position, glm::vec3 size, glm::vec3 rotate) {
+void BaseSprite::Draw(shared_ptr<Shader>& shader, glm::vec3 position, glm::vec3 size, glm::vec3 rotate) {
     auto model = glm::mat4(1.0f);
     model = glm::translate(model, position);
     model = glm::rotate(model, rotate[0], glm::vec3(1.0f, 0.0f, 0.0f));
@@ -53,12 +69,16 @@ void BaseSprite::Draw(glm::vec3 position, glm::vec3 size, glm::vec3 rotate) {
     model = glm::rotate(model, rotate[2], glm::vec3(0.0f, 0.0f, 1.0f));
     model = glm::scale(model, size);
 
-    this->shader->Use();
-    this->shader->SetAttribute("model", model);
+    shader->Use();
+    shader->SetAttribute("model", model);
+
+    ResourceManager::BindTexture(this->diffuse_map, 0);
+    ResourceManager::BindTexture(this->specular_map, 1);
 
     glBindVertexArray(this->vao);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->ebo);
     glDrawElements(GL_TRIANGLES, (int)this->indices.size(), GL_UNSIGNED_INT, nullptr);
     glBindVertexArray(0);
 }
+
 

@@ -15,12 +15,10 @@
 
 class Square: public BaseSprite {
 public:
-    explicit Square(shared_ptr<Shader>& shader);
+    using BaseSprite::BaseSprite;
     ~Square() override = default;
     void LoadData() override;
 };
-
-Square::Square(shared_ptr<Shader>& shader): BaseSprite(shader) {}
 
 void Square::LoadData() {
     this->vertices = {

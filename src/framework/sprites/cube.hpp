@@ -7,12 +7,10 @@
 
 class Cube: public BaseSprite {
 public:
-    explicit Cube(shared_ptr<Shader>& shader);
+    using BaseSprite::BaseSprite;
     ~Cube() override = default;
     void LoadData() override;
 };
-
-Cube::Cube(shared_ptr<Shader>& shader) : BaseSprite(shader) {}
 
 void Cube::LoadData() {
     this->vertices = {
