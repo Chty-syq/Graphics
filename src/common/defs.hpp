@@ -2,11 +2,13 @@
 // Created by chty on 23-7-3.
 //
 #pragma once
+#define STB_IMAGE_IMPLEMENTATION
 #include <GLFW/glfw3.h>
 #include <cstdio>
 #include <memory>
 #include <iostream>
 #include <vector>
+#include <stb_image.h>
 
 namespace fs = std::filesystem;
 

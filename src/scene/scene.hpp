@@ -32,6 +32,7 @@ private:
     static double last_y;
 
     void LoadSceneObjects();
+    void DrawSkybox();
     void Display();
 
     static void KeyboardInput(GLFWwindow* window);
@@ -113,31 +114,45 @@ void GraphScene::MouseScrollCallback(GLFWwindow* window, double offset_x, double
     camera->MouseScroll((float)offset_y);
 }
 
+void GraphScene::DrawSkybox() {
+    glDepthFunc(GL_LEQUAL);
+    Cube skybox("skybox");
+    skybox.LoadData();
+    skybox.LoadBuffer();
+    skybox.Draw(ResourceManager::shader_skybox, glm::vec3(0.0f));
+    glDepthFunc(GL_LESS);
+}
+
 void GraphScene::Display() {
     glEnable(GL_DEPTH_TEST);
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    ResourceManager::shader_obj->Use();
     auto view = camera->GetViewMat();
     auto projection = glm::perspective(glm::radians(camera->GetZoom()), (GLfloat)SCREEN_WIDTH / (GLfloat)SCREEN_HEIGHT, 0.1f, 100.0f);
-    ResourceManager::shader_obj->SetAttribute("view", view);
-    ResourceManager::shader_obj->SetAttribute("projection", projection);
-    ResourceManager::shader_obj->SetAttribute("fLightSpot.sDirection", camera->GetFront());
-    ResourceManager::shader_obj->SetAttribute("fLightSpot.sLightPoint.pPosition", camera->GetPosition());
+    ResourceManager::shader_object->Use();
+    ResourceManager::shader_object->SetAttribute("view", view);
+    ResourceManager::shader_object->SetAttribute("projection", projection);
+    ResourceManager::shader_object->SetAttribute("fLightSpot.sDirection", camera->GetFront());
+    ResourceManager::shader_object->SetAttribute("fLightSpot.sLightPoint.pPosition", camera->GetPosition());
+
+    ResourceManager::shader_skybox->Use();
+    ResourceManager::shader_skybox->SetAttribute("view", glm::mat4(glm::mat3(view)));
+    ResourceManager::shader_skybox->SetAttribute("projection", projection);
+    DrawSkybox();
 
     Floor floor("floor");
     Cube cube("container", "container_spec");
 
     cube.LoadData();
     cube.LoadBuffer();
-    cube.Draw(ResourceManager::shader_obj, glm::vec3(5.0f, 0.5f, 5.0f));
+    cube.Draw(ResourceManager::shader_object, glm::vec3(5.0f, 0.5f, 5.0f));
 
     floor.LoadData();
     floor.LoadBuffer();
-    floor.Draw(ResourceManager::shader_obj, glm::vec3(0.0f, 0.0f, 0.0f));
+    floor.Draw(ResourceManager::shader_object, glm::vec3(0.0f, 0.0f, 0.0f));
 
-    this->models[0]->Draw(ResourceManager::shader_obj, glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.1f));
+    this->models[0]->Draw(ResourceManager::shader_object, glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.1f));
 }
 
 void GraphScene::Render() {
