@@ -85,7 +85,9 @@ void GraphScene::LoadSceneObjects() {
     sprites.push_back(floor);
 
     auto nanosuit = std::make_shared<Model>(fs::current_path().parent_path() / "assets" / "meshes" / "nanosuit" / "nanosuit.obj");
+    auto klee = std::make_shared<Model>(fs::current_path().parent_path() / "assets" / "meshes" / "Klee" / "Klee.pmx");
     models.push_back(nanosuit);
+    models.push_back(klee);
 }
 
 void GraphScene::KeyboardInput(GLFWwindow* window) {
@@ -152,7 +154,8 @@ void GraphScene::Display() {
     floor.LoadBuffer();
     floor.Draw(ResourceManager::shader_object, glm::vec3(0.0f, 0.0f, 0.0f));
 
-    this->models[0]->Draw(ResourceManager::shader_object, glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.1f));
+    //this->models[0]->Draw(ResourceManager::shader_object, glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.1f));
+    this->models[1]->Draw(ResourceManager::shader_object, glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.1f));
 }
 
 void GraphScene::Render() {

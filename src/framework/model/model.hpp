@@ -8,6 +8,7 @@
 #include <assimp/postprocess.h>
 #include <stdexcept>
 #include <string>
+#include <regex>
 #include "framework/sprites/base.hpp"
 #include "framework/texture.hpp"
 #include "framework/model/mesh.hpp"
@@ -83,7 +84,8 @@ std::string Model::ProcessTexture(aiMaterial* material, aiTextureType type) {
     for(int i = 0; i < material->GetTextureCount(type); ++i) {
         aiString str;
         material->GetTexture(type, i, &str);
-        auto path = fs::path(directory + "/" + str.C_Str());
+        auto name = std::regex_replace(std::string(str.C_Str()), std::regex("\\\\"), "/");   //转义windows路径
+        auto path = fs::path(directory + "/" + name);
         ResourceManager::LoadTexture(path);
         return path.stem().string();
     }
