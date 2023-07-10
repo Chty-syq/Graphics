@@ -34,3 +34,7 @@ const float CAMERA_ZOOM = 45.0;
 enum Direction {
     forward, backward, left, right, up, down
 };
+
+enum GameObjectType {
+    sprite, model
+};

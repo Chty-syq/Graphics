@@ -1,12 +1,7 @@
-#define GLEW_STATIC
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
-#include <iostream>
-#include <filesystem>
-#include "scene/scene.hpp"
+#include "scene/render.hpp"
 
 int main() {
-    GraphScene::Init();
-    GraphScene::Render();
+    GraphRender::Init();
+    GraphRender::Render();
     return 0;
 }

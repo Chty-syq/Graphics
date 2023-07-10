@@ -4,6 +4,7 @@
 #pragma once
 #include <stdexcept>
 #include <map>
+#include <queue>
 #include "framework/texture.hpp"
 #include "common/defs.hpp"
 
@@ -47,11 +48,17 @@ void ResourceManager::LoadTexture(const std::string &path, const std::string &na
 }
 
 void ResourceManager::LoadTextures(const std::string &directory) {
-    for(const auto& entry: fs::directory_iterator(directory)) {
-        if (fs::is_directory(entry)) {
-            LoadTextures(entry.path());
-        } else {
-            LoadTexture(entry.path());
+    std::queue<std::string> directories;
+    directories.push(directory);
+    while(!directories.empty()) {
+        auto node = directories.back();
+        directories.pop();
+        for(const auto& entry: fs::directory_iterator(node)) {
+            if (fs::is_directory(entry)) {
+                directories.push(entry.path());
+            } else {
+                LoadTexture(entry.path());
+            }
         }
     }
 }
