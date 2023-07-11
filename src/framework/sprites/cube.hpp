@@ -8,7 +8,6 @@
 class Cube: public BaseSprite {
 public:
     using BaseSprite::BaseSprite;
-    ~Cube() override = default;
     void LoadData() override;
 };
 

@@ -35,10 +35,13 @@ namespace GraphRender {
     int window_pos_x;
     int window_pos_y;
 
+    bool blinn = false;
+
     shared_ptr<CursorManager> cursor = std::make_shared<CursorManager>();
 
     void Display();
     void KeyboardInput();
+    void KeyboardCallback(GLFWwindow* window_, int key, int scancode, int action, int mods);
     void MouseMoveCallback(GLFWwindow* window_, double pos_x, double pos_y);
     void MouseScrollCallback(GLFWwindow* window_, double offset_x, double offset_y);
 
@@ -62,6 +65,7 @@ void GraphRender::Init() {
     glfwMakeContextCurrent(window);
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
 
+    glfwSetKeyCallback(window, KeyboardCallback);
     glfwSetCursorPosCallback(window, MouseMoveCallback);
     glfwSetScrollCallback(window, MouseScrollCallback);
 
@@ -87,6 +91,12 @@ void GraphRender::KeyboardInput() {
     last_frame = cur_frame;
 }
 
+void GraphRender::KeyboardCallback(GLFWwindow* window_, int key, int scancode, int action, int mods) {
+    if (key == GLFW_KEY_B && action == GLFW_PRESS) {
+        ResourceManager::shader_object->SetAttribute("blinn", blinn = !blinn);
+    }
+}
+
 void GraphRender::MouseMoveCallback(GLFWwindow* window_, double pos_x, double pos_y) {
     int center_pos_x = window_pos_x + (int)(SCREEN_WIDTH >> 1);
     int center_pos_y = window_pos_y + (int)(SCREEN_HEIGHT >> 1);
@@ -102,6 +112,7 @@ void GraphRender::MouseScrollCallback(GLFWwindow* window_, double offset_x, doub
 
 void GraphRender::Display() {
     glEnable(GL_DEPTH_TEST);
+    glEnable(GL_FRAMEBUFFER_SRGB); //gamma校正
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 

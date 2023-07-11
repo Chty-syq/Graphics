@@ -19,7 +19,7 @@ public:
     BaseSprite() = default;
     explicit BaseSprite(const std::string &diffuse_map);
     BaseSprite(const std::string &diffuse_map, const std::string &specular_map);
-    virtual ~BaseSprite() = default;
+    ~BaseSprite();
     virtual void LoadData() = 0;
     void LoadBuffer();
     void Draw(
@@ -37,6 +37,12 @@ BaseSprite::BaseSprite(const std::string &diffuse_map) {
 BaseSprite::BaseSprite(const std::string &diffuse_map, const std::string &specular_map) {
     this->diffuse_map = diffuse_map;
     this->specular_map = specular_map;
+}
+
+BaseSprite::~BaseSprite() {
+    glDeleteVertexArrays(1, &this->vao);
+    glDeleteBuffers(1, &this->vbo);
+    glDeleteBuffers(1, &this->ebo);
 }
 
 void BaseSprite::LoadBuffer() {

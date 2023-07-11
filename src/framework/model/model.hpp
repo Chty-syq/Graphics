@@ -42,6 +42,8 @@ Model::Model(const std::string &path) {
     }
     this->directory = path.substr(0, path.find_last_of('/'));
     this->ProcessNode(scene->mRootNode, scene);
+    for (auto &mesh: this->meshes)  mesh.LoadBuffer();
+    importer.FreeScene();
 }
 
 void Model::ProcessNode(aiNode *root, const aiScene *scene) { //bfs扫描结点树
@@ -100,7 +102,6 @@ std::string Model::ProcessTexture(aiMaterial* material, aiTextureType type) {
 
 void Model::Draw(shared_ptr<Shader>& shader, glm::vec3 position, glm::vec3 size, glm::vec3 rotate) {
     for(auto &mesh : this->meshes) {
-        mesh.LoadBuffer();
         mesh.Draw(shader, position, size, rotate);
     }
 }

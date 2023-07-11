@@ -10,7 +10,6 @@
 class Floor: public BaseSprite {
 public:
     using BaseSprite::BaseSprite;
-    ~Floor() override = default;
     void LoadData() override;
 };
 

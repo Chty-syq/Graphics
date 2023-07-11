@@ -34,6 +34,8 @@ struct LightSpot {              //聚光
     LightPoint  sLightPoint;    //点光源
 };
 
+uniform bool blinn;     //是否启用blinn-phong光照模型
+
 uniform vec3 fViewPos;                              //视点位置
 uniform Material material;                          //物体材质
 uniform LightParal fLightParal;                     //平行光
@@ -46,8 +48,15 @@ float GetDiffuseStrength(vec3 lightDir, vec3 norm) {
 
 float GetSpecularStrength(vec3 lightDir, vec3 norm) {
     vec3 viewDir = normalize(fViewPos - fPosition);     //视角方向
-    vec3 reflectDir = reflect(-lightDir, norm);         //反射光方向
-    return pow(max(dot(viewDir, reflectDir), 0.0), material.mShininess);
+    if (!blinn) {
+        vec3 reflectDir = reflect(-lightDir, norm);         //反射光方向
+        return pow(max(dot(viewDir, reflectDir), 0.0), material.mShininess);
+    }
+    else {
+        vec3 halfDir = normalize(lightDir + viewDir);   //半程向量
+        return pow(max(dot(halfDir, norm), 0.0), material.mShininess);
+    }
+
 }
 
 vec3 GetLightParal(LightParal light, vec3 norm) {

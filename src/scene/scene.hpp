@@ -3,6 +3,7 @@
 //
 #pragma once
 #include "common/defs.hpp"
+#include "framework/sprites/sphere.hpp"
 #include "framework/sprites/base.hpp"
 #include "framework/model/model.hpp"
 
@@ -21,8 +22,9 @@ void GraphScene::LoadScene() {
             std::make_shared<Cube>("container", "container_spec"),
             glm::vec3(5.0f, 0.5f, 5.0f)
             );
+
     auto floor = std::make_shared<GameObject>(
-            std::make_shared<Floor>("floor"),
+            std::make_shared<Floor>("floor", "floor"),
             glm::vec3(0.0f)
             );
     auto nanosuit = std::make_shared<GameObject>(
@@ -35,6 +37,14 @@ void GraphScene::LoadScene() {
             glm::vec3(10.0f, 0.0f, 10.0f),
             glm::vec3(0.2f)
             );
+    for(auto & pos : ResourceManager::light_pos) {
+        auto sphere = std::make_shared<GameObject>(
+                std::make_shared<Sphere>("container", "container_spec"),
+                pos,
+                glm::vec3(0.3f)
+        );
+        objects.push_back(sphere);
+    }
     objects.push_back(cube);
     objects.push_back(floor);
     objects.push_back(nanosuit);

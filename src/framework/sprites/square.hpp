@@ -16,7 +16,6 @@
 class Square: public BaseSprite {
 public:
     using BaseSprite::BaseSprite;
-    ~Square() override = default;
     void LoadData() override;
 };
 

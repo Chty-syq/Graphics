@@ -14,6 +14,13 @@ namespace ResourceManager {
     shared_ptr<Shader> shader_object;
     shared_ptr<Shader> shader_skybox;
 
+    vector<glm::vec3> light_pos = {
+            glm::vec3(0.7f,  0.2f,  2.0f),
+            glm::vec3(2.3f, 3.3f, -4.0f),
+            glm::vec3(-4.0f,  2.0f, -12.0f),
+            glm::vec3(0.0f,  1.0f, -3.0f)
+    };
+
     void Init();
 
     void LoadTexture(const std::string &path);
@@ -39,10 +46,7 @@ void ResourceManager::LoadTexture(const std::string &path) {
 }
 
 void ResourceManager::LoadTexture(const std::string &path, const std::string &name) {
-    if (textures.contains(name)) {
-        std::cerr << "[Warning] Duplicated Texture of " + name << std::endl;
-        return;
-    }
+    if (textures.contains(name)) return;
     auto texture = std::make_shared<Texture2D>(vector{path});
     textures.insert(std::make_pair(name, texture));
 }
@@ -99,22 +103,22 @@ void ResourceManager::LoadShaderObject() {
     shader_object->SetAttribute("fLightParal.pFactor.fAmbient", glm::vec3(0.05f, 0.05f, 0.05f));
     shader_object->SetAttribute("fLightParal.pFactor.fDiffuse", glm::vec3(0.4f, 0.4f, 0.4f));
     shader_object->SetAttribute("fLightParal.pFactor.fSpecular", glm::vec3(0.5f, 0.5f, 0.5f));
-    shader_object->SetAttribute("fLightPoint[0].pPosition", glm::vec3(0.7f,  0.2f,  2.0f));
+    shader_object->SetAttribute("fLightPoint[0].pPosition", ResourceManager::light_pos[0]);
     shader_object->SetAttribute("fLightPoint[0].pCoefficient", glm::vec3(1.0f, 0.09f, 0.032f));
     shader_object->SetAttribute("fLightPoint[0].pFactor.fAmbient", glm::vec3(0.05f, 0.05f, 0.05f));
     shader_object->SetAttribute("fLightPoint[0].pFactor.fDiffuse", glm::vec3(0.8f, 0.8f, 0.8f));
     shader_object->SetAttribute("fLightPoint[0].pFactor.fSpecular", glm::vec3(1.0f, 1.0f, 1.0f));
-    shader_object->SetAttribute("fLightPoint[1].pPosition", glm::vec3(2.3f, -3.3f, -4.0f));
+    shader_object->SetAttribute("fLightPoint[1].pPosition", ResourceManager::light_pos[1]);
     shader_object->SetAttribute("fLightPoint[1].pCoefficient", glm::vec3(1.0f, 0.09f, 0.032f));
     shader_object->SetAttribute("fLightPoint[1].pFactor.fAmbient", glm::vec3(0.05f, 0.05f, 0.05f));
     shader_object->SetAttribute("fLightPoint[1].pFactor.fDiffuse", glm::vec3(0.8f, 0.8f, 0.8f));
     shader_object->SetAttribute("fLightPoint[1].pFactor.fSpecular", glm::vec3(1.0f, 1.0f, 1.0f));
-    shader_object->SetAttribute("fLightPoint[2].pPosition", glm::vec3(-4.0f,  2.0f, -12.0f));
+    shader_object->SetAttribute("fLightPoint[2].pPosition", ResourceManager::light_pos[2]);
     shader_object->SetAttribute("fLightPoint[2].pCoefficient", glm::vec3(1.0f, 0.09f, 0.032f));
     shader_object->SetAttribute("fLightPoint[2].pFactor.fAmbient", glm::vec3(0.05f, 0.05f, 0.05f));
     shader_object->SetAttribute("fLightPoint[2].pFactor.fDiffuse", glm::vec3(0.8f, 0.8f, 0.8f));
     shader_object->SetAttribute("fLightPoint[2].pFactor.fSpecular", glm::vec3(1.0f, 1.0f, 1.0f));
-    shader_object->SetAttribute("fLightPoint[3].pPosition", glm::vec3(0.0f,  0.0f, -3.0f));
+    shader_object->SetAttribute("fLightPoint[3].pPosition", ResourceManager::light_pos[3]);
     shader_object->SetAttribute("fLightPoint[3].pCoefficient", glm::vec3(1.0f, 0.09f, 0.032f));
     shader_object->SetAttribute("fLightPoint[3].pFactor.fAmbient", glm::vec3(0.05f, 0.05f, 0.05f));
     shader_object->SetAttribute("fLightPoint[3].pFactor.fDiffuse", glm::vec3(0.8f, 0.8f, 0.8f));
