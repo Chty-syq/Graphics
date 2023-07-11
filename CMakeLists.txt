@@ -6,8 +6,7 @@ set(CMAKE_CXX_STANDARD 20)
 find_package(glfw3 3.3 REQUIRED)
 find_package(OpenGL REQUIRED)
 
-add_subdirectory(third-party/glad)
-add_subdirectory(third-party/assimp)
+add_subdirectory(third-party)
 
 file(GLOB_RECURSE source_files CONFIGURE_DEPENDS src/*.cpp src/*.hpp)
 add_executable(${PROJECT_NAME} ${source_files} src/common/utils.hpp)
@@ -24,6 +23,7 @@ target_link_libraries(${PROJECT_NAME}
         glfw
         OpenGL::GL
         assimp
+        imgui
         $<$<BOOL:${UNIX}>:${X11_LIBRARIES}>     # libX11 for Unix
         ${CMAKE_DL_LIBS}                        # libdl for ubuntu
         )

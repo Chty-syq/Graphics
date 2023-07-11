@@ -24,6 +24,7 @@
 #include "scene/resources.hpp"
 #include "scene/scene.hpp"
 #include "scene/cursor.hpp"
+#include "scene/gui.hpp"
 #include "common/defs.hpp"
 
 #define keydown(x) (glfwGetKey(window, x) == GLFW_PRESS)
@@ -33,7 +34,6 @@ namespace GraphRender {
     unique_ptr<Camera> camera = std::make_unique<Camera>(glm::vec3(1.0f, 1.0f, 1.0f));
     unique_ptr<FrameBuffer> frame_buffer = std::make_unique<FrameBuffer>();
 
-    float last_frame = 0;
     int window_pos_x;
     int window_pos_y;
 
@@ -41,6 +41,7 @@ namespace GraphRender {
 
     shared_ptr<CursorManager> cursor = std::make_shared<CursorManager>();
 
+    void UpdateState();
     void Display();
     void KeyboardInput();
     void KeyboardCallback(GLFWwindow* window_, int key, int scancode, int action, int mods);
@@ -77,12 +78,14 @@ void GraphRender::Init() {
 
     ResourceManager::Init();
     GraphScene::LoadScene();
+    GUI::Init(window);
     frame_buffer->Init();
 }
 
 void GraphRender::KeyboardInput() {
-    auto cur_frame = (float)glfwGetTime();
-    auto duration = cur_frame - last_frame;
+    static double previous_time = glfwGetTime();
+    auto current_time = glfwGetTime();
+    auto duration = (float)(current_time - previous_time);
     if (keydown(GLFW_KEY_W))  camera->KeyboardInput(Direction::forward, duration);
     if (keydown(GLFW_KEY_S))  camera->KeyboardInput(Direction::backward, duration);
     if (keydown(GLFW_KEY_A))  camera->KeyboardInput(Direction::left, duration);
@@ -91,7 +94,7 @@ void GraphRender::KeyboardInput() {
     if (keydown(GLFW_KEY_E))  camera->KeyboardInput(Direction::down, duration);
 
     if (keydown(GLFW_KEY_ESCAPE)) glfwSetWindowShouldClose(window, true);
-    last_frame = cur_frame;
+    previous_time = current_time;
 }
 
 void GraphRender::KeyboardCallback(GLFWwindow* window_, int key, int scancode, int action, int mods) {
@@ -102,16 +105,35 @@ void GraphRender::KeyboardCallback(GLFWwindow* window_, int key, int scancode, i
 }
 
 void GraphRender::MouseMoveCallback(GLFWwindow* window_, double pos_x, double pos_y) {
-    int center_pos_x = window_pos_x + (int)(SCREEN_WIDTH >> 1);
-    int center_pos_y = window_pos_y + (int)(SCREEN_HEIGHT >> 1);
-    double offset_x = pos_x - (SCREEN_WIDTH >> 1);
-    double offset_y = (SCREEN_HEIGHT >> 1) - pos_y;
+//    int center_pos_x = window_pos_x + (int)(SCREEN_WIDTH >> 1);
+//    int center_pos_y = window_pos_y + (int)(SCREEN_HEIGHT >> 1);
+//    double offset_x = pos_x - (SCREEN_WIDTH >> 1);
+//    double offset_y = (SCREEN_HEIGHT >> 1) - pos_y;
+//    camera->MouseMove((float)offset_x, (float)offset_y);
+//    cursor->SetCursorPosLinux(center_pos_x, center_pos_y);
+    static double last_x = 0.0, last_y = 0.0;
+    double offset_x = pos_x - last_x;
+    double offset_y = last_y - pos_y;
     camera->MouseMove((float)offset_x, (float)offset_y);
-    cursor->SetCursorPosLinux(center_pos_x, center_pos_y);
+    last_x = pos_x;
+    last_y = pos_y;
 }
 
 void GraphRender::MouseScrollCallback(GLFWwindow* window_, double offset_x, double offset_y) {
     camera->MouseScroll((float)offset_y);
+}
+
+void GraphRender::UpdateState() {
+    static int frame_cnt = 0;
+    static double previous_time = glfwGetTime();
+
+    ++frame_cnt;
+    double current_time = glfwGetTime();
+    if (current_time - previous_time >= 1.0) {
+        GUI::fps = frame_cnt;
+        frame_cnt = 0;
+        previous_time = current_time;
+    }
 }
 
 void GraphRender::Display() {
@@ -142,9 +164,11 @@ void GraphRender::Display() {
 void GraphRender::Render() {
     while(!glfwWindowShouldClose(window))
     {
+        UpdateState();
         glfwPollEvents();
         KeyboardInput();
         Display();
+        GUI::Render();
         glfwSwapBuffers(window);
     }
     glfwTerminate();
