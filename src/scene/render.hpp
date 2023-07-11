@@ -20,6 +20,7 @@
 #include "framework/texture.hpp"
 #include "framework/camera.hpp"
 #include "framework/game_object.hpp"
+#include "framework/frame_buffer.hpp"
 #include "scene/resources.hpp"
 #include "scene/scene.hpp"
 #include "scene/cursor.hpp"
@@ -30,6 +31,7 @@
 namespace GraphRender {
     GLFWwindow* window;
     unique_ptr<Camera> camera = std::make_unique<Camera>(glm::vec3(1.0f, 1.0f, 1.0f));
+    unique_ptr<FrameBuffer> frame_buffer = std::make_unique<FrameBuffer>();
 
     float last_frame = 0;
     int window_pos_x;
@@ -75,6 +77,7 @@ void GraphRender::Init() {
 
     ResourceManager::Init();
     GraphScene::LoadScene();
+    frame_buffer->Init();
 }
 
 void GraphRender::KeyboardInput() {
@@ -93,6 +96,7 @@ void GraphRender::KeyboardInput() {
 
 void GraphRender::KeyboardCallback(GLFWwindow* window_, int key, int scancode, int action, int mods) {
     if (key == GLFW_KEY_B && action == GLFW_PRESS) {
+        ResourceManager::shader_object->Use();
         ResourceManager::shader_object->SetAttribute("blinn", blinn = !blinn);
     }
 }
@@ -111,8 +115,9 @@ void GraphRender::MouseScrollCallback(GLFWwindow* window_, double offset_x, doub
 }
 
 void GraphRender::Display() {
+    frame_buffer->Bind();
     glEnable(GL_DEPTH_TEST);
-    glEnable(GL_FRAMEBUFFER_SRGB); //gamma校正
+    //glEnable(GL_FRAMEBUFFER_SRGB); //gamma校正
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -130,6 +135,8 @@ void GraphRender::Display() {
 
     GraphScene::DrawSkybox();
     GraphScene::DrawScene();
+
+    frame_buffer->Render();
 }
 
 void GraphRender::Render() {

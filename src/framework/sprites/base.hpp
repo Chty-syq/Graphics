@@ -22,6 +22,7 @@ public:
     ~BaseSprite();
     virtual void LoadData() = 0;
     void LoadBuffer();
+    void Render() const;  //渲染
     void Draw(
         shared_ptr<Shader>& shader,
         glm::vec3 position,
@@ -67,6 +68,13 @@ void BaseSprite::LoadBuffer() {
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
+void BaseSprite::Render() const {
+    glBindVertexArray(this->vao);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->ebo);
+    glDrawElements(GL_TRIANGLES, (int)this->indices.size(), GL_UNSIGNED_INT, nullptr);
+    glBindVertexArray(0);
+}
+
 void BaseSprite::Draw(shared_ptr<Shader>& shader, glm::vec3 position, glm::vec3 size, glm::vec3 rotate) {
     auto model = glm::mat4(1.0f);
     model = glm::translate(model, position);
@@ -81,10 +89,5 @@ void BaseSprite::Draw(shared_ptr<Shader>& shader, glm::vec3 position, glm::vec3 
     ResourceManager::BindTexture(this->diffuse_map, 0);
     ResourceManager::BindTexture(this->specular_map, 1);
 
-    glBindVertexArray(this->vao);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->ebo);
-    glDrawElements(GL_TRIANGLES, (int)this->indices.size(), GL_UNSIGNED_INT, nullptr);
-    glBindVertexArray(0);
+    this->Render();
 }
-
-

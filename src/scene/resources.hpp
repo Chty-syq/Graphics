@@ -13,6 +13,7 @@ namespace ResourceManager {
     std::map<std::string, shared_ptr<Texture2D>> textures;
     shared_ptr<Shader> shader_object;
     shared_ptr<Shader> shader_skybox;
+    shared_ptr<Shader> shader_screen;
 
     vector<glm::vec3> light_pos = {
             glm::vec3(0.7f,  0.2f,  2.0f),
@@ -133,4 +134,8 @@ void ResourceManager::LoadShaderObject() {
     shader_skybox = std::make_shared<Shader>(fs::current_path().parent_path() / "shaders" / "skybox");
     shader_skybox->Use();
     shader_skybox->SetAttribute("fSkybox", 0);
+
+    shader_screen = std::make_shared<Shader>(fs::current_path().parent_path() / "shaders" / "screen");
+    shader_screen->Use();
+    shader_screen->SetAttribute("fScreen", 0);
 }
