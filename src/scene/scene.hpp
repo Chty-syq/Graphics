@@ -12,15 +12,15 @@ namespace GraphScene {
     shared_ptr<GameObject> skybox;
 
     void LoadScene();
-    void DrawSkybox();
-    void DrawScene();
+    void RenderSkybox(shared_ptr<Shader>& shader);
+    void RenderObjects(shared_ptr<Shader>& shader);
 }
 
 void GraphScene::LoadScene() {
     skybox = std::make_shared<GameObject>(std::make_shared<Cube>("skybox"), glm::vec3(0.0f));
     auto cube = std::make_shared<GameObject>(
             std::make_shared<Cube>("container", "container_spec"),
-            glm::vec3(5.0f, 0.5f, 5.0f)
+            glm::vec3(3.0f, 1.0f, 3.0f)
             );
 
     auto floor = std::make_shared<GameObject>(
@@ -29,12 +29,12 @@ void GraphScene::LoadScene() {
             );
     auto nanosuit = std::make_shared<GameObject>(
             std::make_shared<Model>(fs::current_path().parent_path() / "assets" / "meshes" / "nanosuit" / "nanosuit.obj"),
-            glm::vec3(0.0f, 0.0f, 10.0f),
+            glm::vec3(0.0f, 0.0f, 3.0f),
             glm::vec3(0.2f)
             );
     auto klee = std::make_shared<GameObject>(
             std::make_shared<Model>(fs::current_path().parent_path() / "assets" / "meshes" / "Klee" / "Klee.pmx"),
-            glm::vec3(10.0f, 0.0f, 10.0f),
+            glm::vec3(3.0f, 0.0f, 0.0f),
             glm::vec3(0.2f)
             );
     for(auto & pos : ResourceManager::light_pos) {
@@ -51,14 +51,14 @@ void GraphScene::LoadScene() {
     objects.push_back(klee);
 }
 
-void GraphScene::DrawSkybox() {
+void GraphScene::RenderSkybox(shared_ptr<Shader>& shader) {
     glDepthFunc(GL_LEQUAL);
-    skybox->Draw(ResourceManager::shader_skybox);
+    skybox->Draw(shader);
     glDepthFunc(GL_LESS);
 }
 
-void GraphScene::DrawScene() {
+void GraphScene::RenderObjects(shared_ptr<Shader>& shader) {
     for(auto & object : objects) {
-        object->Draw(ResourceManager::shader_object);
+        object->Draw(shader);
     }
 }

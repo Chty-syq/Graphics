@@ -27,6 +27,9 @@ const double PI = acos(-1);
 const GLuint SCREEN_WIDTH = 1920;
 const GLuint SCREEN_HEIGHT = 1080;
 
+const GLuint SHADOW_WIDTH = 1024;
+const GLuint SHADOW_HEIGHT = 1024;
+
 const float CAMERA_PITCH = 0.0;
 const float CAMERA_YAW = -90.0;
 const float CAMERA_SPEED = 3.0;

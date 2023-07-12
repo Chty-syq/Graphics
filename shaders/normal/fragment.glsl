@@ -2,9 +2,10 @@
 
 #define NUM_POINT_LIGHT 4
 
-in vec2 fTexCoord;   //纹理坐标
-in vec3 fNormal;     //法向量
-in vec3 fPosition;   //片元位置(世界系)
+in vec2 fTexCoord;      //纹理坐标
+in vec3 fNormal;        //法向量
+in vec3 fPosition;      //片元位置(世界系)
+in vec4 fPositionLight; //片元位置(光源坐标系)
 
 out vec4 color;
 
@@ -34,7 +35,8 @@ struct LightSpot {              //聚光
     LightPoint  sLightPoint;    //点光源
 };
 
-uniform bool blinn;     //是否启用blinn-phong光照模型
+uniform bool blinn;             //是否启用blinn-phong光照模型
+uniform sampler2D fShadowMap;   //阴影贴图
 
 uniform vec3 fViewPos;                              //视点位置
 uniform Material material;                          //物体材质
@@ -56,15 +58,34 @@ float GetSpecularStrength(vec3 lightDir, vec3 norm) {
         vec3 halfDir = normalize(lightDir + viewDir);   //半程向量
         return pow(max(dot(halfDir, norm), 0.0), material.mShininess);
     }
+}
 
+float GetLightParalShadow(vec3 lightDir, vec3 norm) {
+    vec3 proj_coords = fPositionLight.xyz / fPositionLight.w;
+    if (proj_coords.z > 1.0) return 0.0;
+    proj_coords = proj_coords * 0.5 + 0.5;
+
+    float current_depth = proj_coords.z;
+    float bias = max(0.005, 0.05 * (1.0 - dot(lightDir, norm)));
+
+    float shadow = 0.0;
+    vec2 stride = 1.0 / textureSize(fShadowMap, 0);
+    for(int i = -1; i <= 1; ++i) {
+        for(int j = -1; j <= 1; ++j) {
+            float closest_depth = texture(fShadowMap, proj_coords.xy + vec2(i, j) * stride).r;
+            shadow += current_depth - bias > closest_depth ? 1.0 : 0.0;
+        }
+    }
+    return shadow / 9.0;
 }
 
 vec3 GetLightParal(LightParal light, vec3 norm) {
     vec3 lightDir = normalize(-light.pDirection);
     vec3 reflectDir = reflect(-lightDir, norm);
 
-    float diffuse = GetDiffuseStrength(lightDir, norm);
-    float specular = GetSpecularStrength(lightDir, norm);
+    float shadow = GetLightParalShadow(lightDir, norm);
+    float diffuse = GetDiffuseStrength(lightDir, norm) * (1 - shadow);
+    float specular = GetSpecularStrength(lightDir, norm) * (1 - shadow);
 
     vec3 diffuseTex = texture(material.mDiffuse, fTexCoord).rgb * (light.pFactor.fDiffuse * diffuse + light.pFactor.fAmbient);
     vec3 specularTex = texture(material.mSpecular, fTexCoord).rgb * (light.pFactor.fSpecular * specular);

@@ -21,6 +21,7 @@
 #include "framework/camera.hpp"
 #include "framework/game_object.hpp"
 #include "framework/frame_buffer.hpp"
+#include "framework/depth_buffer.hpp"
 #include "scene/resources.hpp"
 #include "scene/scene.hpp"
 #include "scene/cursor.hpp"
@@ -33,6 +34,7 @@ namespace GraphRender {
     GLFWwindow* window;
     unique_ptr<Camera> camera = std::make_unique<Camera>(glm::vec3(1.0f, 1.0f, 1.0f));
     unique_ptr<FrameBuffer> frame_buffer = std::make_unique<FrameBuffer>();
+    unique_ptr<DepthBuffer> depth_buffer = std::make_unique<DepthBuffer>();
 
     int window_pos_x;
     int window_pos_y;
@@ -80,6 +82,7 @@ void GraphRender::Init() {
     GraphScene::LoadScene();
     GUI::Init(window);
     frame_buffer->Init();
+    depth_buffer->Init();
 }
 
 void GraphRender::KeyboardInput() {
@@ -137,11 +140,27 @@ void GraphRender::UpdateState() {
 }
 
 void GraphRender::Display() {
-    frame_buffer->Bind();
     glEnable(GL_DEPTH_TEST);
     //glEnable(GL_FRAMEBUFFER_SRGB); //gamma校正
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    //阴影贴图
+    glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
+    depth_buffer->Bind();
+    glCullFace(GL_FRONT);
+    GraphScene::RenderObjects(ResourceManager::shader_depth);
+    glCullFace(GL_BACK);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glActiveTexture(GL_TEXTURE2);
+    glBindTexture(GL_TEXTURE_2D, depth_buffer->depth_texture);
+
+    //场景
+    glEnable(GL_DEPTH_TEST);
+    glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+    //frame_buffer->Bind();
 
     auto view = camera->GetViewMat();
     auto projection = glm::perspective(glm::radians(camera->GetZoom()), (GLfloat)SCREEN_WIDTH / (GLfloat)SCREEN_HEIGHT, 0.1f, 100.0f);
@@ -155,10 +174,11 @@ void GraphRender::Display() {
     ResourceManager::shader_skybox->SetAttribute("view", glm::mat4(glm::mat3(view)));
     ResourceManager::shader_skybox->SetAttribute("projection", projection);
 
-    GraphScene::DrawSkybox();
-    GraphScene::DrawScene();
+    GraphScene::RenderSkybox(ResourceManager::shader_skybox);
+    GraphScene::RenderObjects(ResourceManager::shader_object);
 
-    frame_buffer->Render();
+    //depth_buffer->Render();
+    //frame_buffer->Render();
 }
 
 void GraphRender::Render() {
@@ -168,7 +188,7 @@ void GraphRender::Render() {
         glfwPollEvents();
         KeyboardInput();
         Display();
-        GUI::Render();
+        //GUI::Render();
         glfwSwapBuffers(window);
     }
     glfwTerminate();

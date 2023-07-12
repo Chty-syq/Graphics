@@ -14,9 +14,10 @@ namespace ResourceManager {
     shared_ptr<Shader> shader_object;
     shared_ptr<Shader> shader_skybox;
     shared_ptr<Shader> shader_screen;
+    shared_ptr<Shader> shader_depth;
 
     vector<glm::vec3> light_pos = {
-            glm::vec3(0.7f,  0.2f,  2.0f),
+            glm::vec3(0.7f,  4.2f,  2.0f),
             glm::vec3(2.3f, 3.3f, -4.0f),
             glm::vec3(-4.0f,  2.0f, -12.0f),
             glm::vec3(0.0f,  1.0f, -3.0f)
@@ -95,8 +96,13 @@ void ResourceManager::BindTexture(const std::string &name, int index) {
 }
 
 void ResourceManager::LoadShaderObject() {
+    auto projection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, 1.0f, 7.5f);
+    auto view = glm::lookAt(glm::vec3(-2.0f, 4.0f, -1.0f), glm::vec3(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+
     shader_object = std::make_shared<Shader>(fs::current_path().parent_path() / "shaders" / "normal");
     shader_object->Use();
+    shader_object->SetAttribute("mLightSpace", projection * view);
+    shader_object->SetAttribute("fShadowMap", 2);
     shader_object->SetAttribute("material.mDiffuse", 0);
     shader_object->SetAttribute("material.mSpecular", 1);
     shader_object->SetAttribute("material.mShininess", 0.4f * 128);
@@ -138,4 +144,8 @@ void ResourceManager::LoadShaderObject() {
     shader_screen = std::make_shared<Shader>(fs::current_path().parent_path() / "shaders" / "screen");
     shader_screen->Use();
     shader_screen->SetAttribute("fScreen", 0);
+
+    shader_depth = std::make_shared<Shader>(fs::current_path().parent_path() / "shaders" / "depth");
+    shader_depth->Use();
+    shader_depth->SetAttribute("mLightSpace", projection * view);
 }
