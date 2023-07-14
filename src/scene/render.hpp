@@ -142,12 +142,12 @@ void GraphRender::UpdateState() {
 void GraphRender::Display() {
     glEnable(GL_DEPTH_TEST);
     //glEnable(GL_FRAMEBUFFER_SRGB); //gamma校正
-    glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    //阴影贴图
+    //depth_buffer
     glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
     depth_buffer->Bind();
+    glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glCullFace(GL_FRONT);
     GraphScene::RenderObjects(ResourceManager::shader_depth);
     glCullFace(GL_BACK);
@@ -155,12 +155,11 @@ void GraphRender::Display() {
     glActiveTexture(GL_TEXTURE2);
     glBindTexture(GL_TEXTURE_2D, depth_buffer->depth_texture);
 
-    //场景
-    glEnable(GL_DEPTH_TEST);
+    //color_buffer
+    glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+    frame_buffer->Bind();
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
-    //frame_buffer->Bind();
 
     auto view = camera->GetViewMat();
     auto projection = glm::perspective(glm::radians(camera->GetZoom()), (GLfloat)SCREEN_WIDTH / (GLfloat)SCREEN_HEIGHT, 0.1f, 100.0f);
@@ -178,7 +177,7 @@ void GraphRender::Display() {
     GraphScene::RenderObjects(ResourceManager::shader_object);
 
     //depth_buffer->Render();
-    //frame_buffer->Render();
+    frame_buffer->Render();
 }
 
 void GraphRender::Render() {

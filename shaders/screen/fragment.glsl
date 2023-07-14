@@ -31,8 +31,35 @@ vec4 Convolution(float[9] kernal) {//卷积
     return vec4(color, 1.0);
 }
 
+vec4 ReinhardMapping(vec4 color) {
+    vec3 hdr = color.rgb;
+    vec3 reinhard = hdr / (hdr + vec3(1.0f));
+    return vec4(reinhard, 1.0f);
+}
+
+vec4 ExpMapping(vec4 color, float exposure) {
+    vec3 hdr = color.rgb;
+    vec3 tone = vec3(1.0f) - exp(-hdr * exposure);
+    return vec4(tone, 1.0f);
+}
+
+vec4 ACESToneMapping(vec4 color) {
+    const float A = 2.51f;
+    const float B = 0.03f;
+    const float C = 2.43f;
+    const float D = 0.59f;
+    const float E = 0.14f;
+
+    vec3 hdr = color.rgb;
+    vec3 tone = (hdr * (A * hdr + B)) / (hdr * (C * hdr + D) + E);
+
+    return vec4(tone, 1.0);
+}
+
 void main() {
     color = texture(fScreen, fTexCoord);
     //color = Grey(color);
     //color = Convolution(kEdge);
+    color = ExpMapping(color, 1.0f);
+    //color = ReinhardMapping(color);
 }
