@@ -6,11 +6,11 @@
 #include "framework/sprites/base.hpp"
 #include "common/defs.hpp"
 
-class Sphere: public BaseSprite {
+class Sphere: public BaseSprite { //球体
 public:
     using BaseSprite::BaseSprite;
     void LoadData() override;
-
+private:
     static const int rows = 30;
     static const int cols = 40;
 };

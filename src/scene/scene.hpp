@@ -3,7 +3,10 @@
 //
 #pragma once
 #include "common/defs.hpp"
-#include "framework/sprites/sphere.hpp"
+#include "framework/sprites/2D/cycle.hpp"
+#include "framework/sprites/3D/sphere.hpp"
+#include "framework/sprites/3D/cylinder.hpp"
+#include "framework/sprites/3D/cone.hpp"
 #include "framework/sprites/base.hpp"
 #include "framework/model/model.hpp"
 
@@ -19,8 +22,10 @@ namespace GraphScene {
 void GraphScene::LoadScene() {
     skybox = std::make_shared<GameObject>(std::make_shared<Cube>("skybox"), glm::vec3(0.0f));
     auto cube = std::make_shared<GameObject>(
-            std::make_shared<Cube>("container", "container_spec"),
-            glm::vec3(3.0f, 1.0f, 3.0f)
+            std::make_shared<Cone>("container", "container_spec"),
+            glm::vec3(3.0f, 1.0f, 3.0f),
+            glm::vec3(1.0f),
+            glm::vec3(glm::radians(90.0f))
             );
 
     auto floor = std::make_shared<GameObject>(
@@ -37,10 +42,10 @@ void GraphScene::LoadScene() {
             glm::vec3(3.0f, 0.0f, 0.0f),
             glm::vec3(0.2f)
             );
-    for(auto & pos : ResourceManager::light_pos) {
+    for(auto & light_point : ResourceManager::light_points) {
         auto sphere = std::make_shared<GameObject>(
                 std::make_shared<Sphere>("container", "container_spec"),
-                pos,
+                light_point.position,
                 glm::vec3(0.3f)
         );
         objects.push_back(sphere);

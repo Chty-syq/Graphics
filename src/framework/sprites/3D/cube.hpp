@@ -2,10 +2,10 @@
 // Created by chty on 23-7-4.
 //
 #pragma once
-#include <framework/sprites/base.hpp>
+#include "framework/sprites/base.hpp"
 #include <utility>
 
-class Cube: public BaseSprite {
+class Cube: public BaseSprite { //立方体
 public:
     using BaseSprite::BaseSprite;
     void LoadData() override;

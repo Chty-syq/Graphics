@@ -16,7 +16,7 @@ if(UNIX)
     message(STATUS "X11_FOUND = ${X11_FOUND}")
     message(STATUS "X11_INCLUDE_DIR = ${X11_INCLUDE_DIR}")
     message(STATUS "X11_LIBRARIES = ${X11_LIBRARIES}")
-endif ()
+endif()
 
 target_link_libraries(${PROJECT_NAME}
         glad
@@ -25,7 +25,7 @@ target_link_libraries(${PROJECT_NAME}
         assimp
         imgui
         $<$<BOOL:${UNIX}>:${X11_LIBRARIES}>     # libX11 for Unix
-        ${CMAKE_DL_LIBS}                        # libdl for ubuntu
+        $<$<BOOL:${UNIX}>:${CMAKE_DL_LIBS}>     # libdl for ubuntu
         )
 target_include_directories(${PROJECT_NAME} PUBLIC  # header-only package
         src

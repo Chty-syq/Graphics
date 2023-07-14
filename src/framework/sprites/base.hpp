@@ -7,6 +7,7 @@
 #include "scene/resources.hpp"
 #include <common/defs.hpp>
 #include <utility>
+#include <numeric>
 
 class BaseSprite {
 protected:
@@ -15,6 +16,8 @@ protected:
     GLuint vao{}, vbo{}, ebo{};
     std::string diffuse_map = "empty";
     std::string specular_map = "empty";
+    void Combine(const BaseSprite& other);
+    void Combine(const GLfloatVec& o_vertices, const GLuintVec& o_indices);
 public:
     BaseSprite() = default;
     explicit BaseSprite(const std::string &diffuse_map);
@@ -44,6 +47,18 @@ BaseSprite::~BaseSprite() {
     glDeleteVertexArrays(1, &this->vao);
     glDeleteBuffers(1, &this->vbo);
     glDeleteBuffers(1, &this->ebo);
+}
+
+void BaseSprite::Combine(const BaseSprite &other) {
+    this->Combine(other.vertices, other.indices);
+}
+
+void BaseSprite::Combine(const GLfloatVec &o_vertices, const GLuintVec& o_indices) {
+    int offset = (int)this->vertices.size() / 8;
+    for(auto & index : o_indices) {
+        this->indices.push_back(index + offset);
+    }
+    this->vertices.insert(this->vertices.end(), o_vertices.begin(), o_vertices.end());
 }
 
 void BaseSprite::LoadBuffer() {

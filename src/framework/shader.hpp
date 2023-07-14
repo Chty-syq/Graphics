@@ -9,6 +9,7 @@
 #include <iostream>
 #include <utility>
 #include "glm/gtc/type_ptr.hpp"
+#include "common/structs.hpp"
 
 class Shader {
 private:
@@ -27,6 +28,9 @@ public:
     void SetAttribute(const std::string &name, float value) const;
     void SetAttribute(const std::string &name, const glm::vec3 &value) const;
     void SetAttribute(const std::string &name, const glm::mat4 &value) const;
+    void SetLightParal(LightParal light) const;
+    void SetLightPoint(LightPoint light, int index) const;
+    void SetLightSpot(LightSpot light) const;
 };
 
 Shader::Shader(const std::string& path) {
@@ -111,4 +115,28 @@ void Shader::SetAttribute(const std::string &name, const glm::vec3 &value) const
 void Shader::SetAttribute(const std::string &name, const glm::mat4 &value) const {
     auto location = glGetUniformLocation(program, name.c_str());
     glUniformMatrix4fv(location, 1, GL_FALSE, &value[0][0]);
+}
+
+void Shader::SetLightParal(LightParal light) const {
+    this->SetAttribute("fLightParal.pDirection", light.direction);
+    this->SetAttribute("fLightParal.pFactor.fAmbient", light.factor.ambient);
+    this->SetAttribute("fLightParal.pFactor.fDiffuse", light.factor.diffuse);
+    this->SetAttribute("fLightParal.pFactor.fSpecular", light.factor.specular);
+}
+
+void Shader::SetLightPoint(LightPoint light, int index) const {
+    this->SetAttribute("fLightPoint[" + std::to_string(index) + "].pPosition", light.position);
+    this->SetAttribute("fLightPoint[" + std::to_string(index) + "].pCoefficient", light.coefficient);
+    this->SetAttribute("fLightPoint[" + std::to_string(index) + "].pFactor.fAmbient", light.factor.ambient);
+    this->SetAttribute("fLightPoint[" + std::to_string(index) + "].pFactor.fDiffuse", light.factor.diffuse);
+    this->SetAttribute("fLightPoint[" + std::to_string(index) + "].pFactor.fSpecular", light.factor.specular);
+}
+
+void Shader::SetLightSpot(LightSpot light) const {
+    this->SetAttribute("fLightSpot.sCutoffInner", light.cutoff_inner);
+    this->SetAttribute("fLightSpot.sCutoffOuter", light.cutoff_outer);
+    this->SetAttribute("fLightSpot.sLightPoint.pCoefficient", light.light_point.coefficient);
+    this->SetAttribute("fLightSpot.sLightPoint.pFactor.fAmbient", light.light_point.factor.ambient);
+    this->SetAttribute("fLightSpot.sLightPoint.pFactor.fDiffuse", light.light_point.factor.diffuse);
+    this->SetAttribute("fLightSpot.sLightPoint.pFactor.fSpecular", light.light_point.factor.specular);
 }

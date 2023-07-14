@@ -4,7 +4,7 @@
 
 #pragma once
 #include <stdexcept>
-#include "framework/sprites/square.hpp"
+#include "framework/sprites/2D/square.hpp"
 
 class FrameBuffer {
 private:

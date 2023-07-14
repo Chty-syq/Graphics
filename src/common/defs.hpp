@@ -9,6 +9,7 @@
 #include <iostream>
 #include <vector>
 #include <stb_image.h>
+#include "common/structs.hpp"
 
 namespace fs = std::filesystem;
 
@@ -22,7 +23,7 @@ using std::shared_ptr;
 using GLfloatVec = std::vector<GLfloat>;
 using GLuintVec = std::vector<GLuint>;
 
-const double PI = acos(-1);
+const float PI = acos(-1);
 
 const GLuint SCREEN_WIDTH = 1920;
 const GLuint SCREEN_HEIGHT = 1080;
