@@ -6,11 +6,11 @@
 
 class Mesh: public BaseSprite {
 public:
-    Mesh(GLfloatVec &vertices, GLuintVec &indices, const std::string &diffuse_map = "empty", const std::string &specular_map = "empty");
+    Mesh(VertexArr &vertices, IndiceArr &indices, const std::string &diffuse_map = "empty", const std::string &specular_map = "empty");
     void LoadData() override;
 };
 
-Mesh::Mesh(GLfloatVec &vertices, GLuintVec &indices, const std::string &diffuse_map, const std::string &specular_map): BaseSprite(diffuse_map, specular_map) {
+Mesh::Mesh(VertexArr &vertices, IndiceArr &indices, const std::string &diffuse_map, const std::string &specular_map): BaseSprite(diffuse_map, specular_map) {
     this->vertices = vertices;
     this->indices = indices;
 }

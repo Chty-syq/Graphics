@@ -20,10 +20,10 @@ using std::vector;
 using std::unique_ptr;
 using std::shared_ptr;
 
-using GLfloatVec = std::vector<GLfloat>;
-using GLuintVec = std::vector<GLuint>;
+using VertexArr = std::vector<Vertex>;
+using IndiceArr = std::vector<GLuint>;
 
-const float PI = acos(-1);
+const float PI = (float)acos(-1);
 
 const GLuint SCREEN_WIDTH = 1920;
 const GLuint SCREEN_HEIGHT = 1080;

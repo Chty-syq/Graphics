@@ -63,14 +63,17 @@ void Model::ProcessNode(aiNode *root, const aiScene *scene) { //bfs扫描结点�
 }
 
 void Model::ProcessMesh(aiMesh *mesh, const aiScene *scene) {
-    GLfloatVec vertices;
-    GLuintVec indices;
+    VertexArr vertices;
+    IndiceArr indices;
     for(int i = 0; i < mesh->mNumVertices; ++i) {
         auto position = mesh->mVertices[i];
         auto normal = mesh->mNormals[i];
         auto tex_coord = mesh->mTextureCoords[0] ? mesh->mTextureCoords[0][i] : aiVector3D(0.0f);
-        GLfloatVec vertex = { position.x, position.y, position.z, tex_coord.x, tex_coord.y, normal.x, normal.y, normal.z };
-        vertices.insert(vertices.end(), vertex.begin(), vertex.end());
+        vertices.emplace_back(
+                glm::vec3(position.x, position.y, position.z),
+                glm::vec2(tex_coord.x, tex_coord.y),
+                glm::vec3(normal.x, normal.y, normal.z)
+                );
     }
     for(int i = 0; i < mesh->mNumFaces; ++i) {
         auto face = mesh->mFaces[i];

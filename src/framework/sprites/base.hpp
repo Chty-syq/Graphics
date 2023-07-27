@@ -11,13 +11,13 @@
 
 class BaseSprite {
 protected:
-    GLfloatVec vertices;
-    GLuintVec indices;
+    VertexArr vertices;
+    IndiceArr indices;
     GLuint vao{}, vbo{}, ebo{};
     std::string diffuse_map = "empty";
     std::string specular_map = "empty";
     void Combine(const BaseSprite& other);
-    void Combine(const GLfloatVec& o_vertices, const GLuintVec& o_indices);
+    void Combine(const VertexArr& o_vertices, const IndiceArr& o_indices);
 public:
     BaseSprite() = default;
     explicit BaseSprite(const std::string &diffuse_map);
@@ -53,8 +53,8 @@ void BaseSprite::Combine(const BaseSprite &other) {
     this->Combine(other.vertices, other.indices);
 }
 
-void BaseSprite::Combine(const GLfloatVec &o_vertices, const GLuintVec& o_indices) {
-    int offset = (int)this->vertices.size() / 8;
+void BaseSprite::Combine(const VertexArr &o_vertices, const IndiceArr& o_indices) {
+    int offset = (int)this->vertices.size();
     for(auto & index : o_indices) {
         this->indices.push_back(index + offset);
     }
@@ -67,11 +67,11 @@ void BaseSprite::LoadBuffer() {
 
     glGenBuffers(1, &vbo);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(GLfloat), vertices.data(), GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), vertices.data(), GL_STATIC_DRAW);
 
     glGenBuffers(1, &ebo);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(GLfloat), indices.data(), GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(GLuint), indices.data(), GL_STATIC_DRAW);
 
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (void*)0);
     glEnableVertexAttribArray(0);

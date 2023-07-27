@@ -14,8 +14,6 @@
 #include "glm/gtc/matrix_transform.hpp"
 #include "framework/camera.hpp"
 #include "framework/shader.hpp"
-#include "framework/sprites/2D/floor.hpp"
-#include "framework/sprites/3D/cube.hpp"
 #include "framework/model/model.hpp"
 #include "framework/texture.hpp"
 #include "framework/camera.hpp"

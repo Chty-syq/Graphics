@@ -18,16 +18,11 @@ private:
 void Cycle::LoadData() {
     for(int i = 0; i <= nums; ++i) {
         float theta = 2.0f * PI * (GLfloat)i / (GLfloat)nums;
-        this->vertices.insert(this->vertices.end(), {
-            cos(theta),
-            0.0f,
-            sin(theta),
-            cos(theta) / 2 + 0.5f,
-            sin(theta) / 2 + 0.5f,
-            0.0f,
-            1.0f,
-            0.0f
-        });
+        this->vertices.emplace_back(
+                glm::vec3(cos(theta), 0.0f, sin(theta)),
+                glm::vec2(cos(theta) / 2 + 0.5f, sin(theta) / 2 + 0.5f),
+                glm::vec3(0.0f,1.0f,0.0f)
+        );
         if (i == nums) continue;
         this->indices.insert(this->indices.end(), {
             (GLuint)i,
@@ -35,7 +30,9 @@ void Cycle::LoadData() {
             (GLuint)nums + 1
         });
     }
-    this->vertices.insert(this->vertices.end(), { //中心点
-        0.0f, 0.0f, 0.0f, 0.5f, 0.5f, 0.0f, 1.0f, 0.0f
-    });
+    this->vertices.emplace_back( //中心点
+        glm::vec3(0.0f, 0.0f, 0.0f),
+        glm::vec2(0.5f, 0.5f),
+        glm::vec3(0.0f, 1.0f, 0.0f)
+    );
 }

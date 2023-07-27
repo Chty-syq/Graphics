@@ -5,6 +5,14 @@
 #pragma once
 
 #include "glm/vec3.hpp"
+#include "glm/vec2.hpp"
+
+struct Vertex {
+    glm::vec3   position;
+    glm::vec2   tex_coord;
+    glm::vec3   normal;
+    Vertex(glm::vec3 position, glm::vec2 tex_coord, glm::vec3 normal): position(position), tex_coord(tex_coord), normal(normal) {}
+};
 
 struct LightFactor {
     glm::vec3   ambient;

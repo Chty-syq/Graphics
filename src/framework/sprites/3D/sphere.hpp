@@ -20,16 +20,11 @@ void Sphere::LoadData() {
         for(int j = 0; j <= cols; ++j) {
             float fhi = 1.0f * PI * (GLfloat)i / (GLfloat)rows;
             float phi = 2.0f * PI * (GLfloat)j / (GLfloat)cols;
-            this->vertices.insert(this->vertices.end(), {
-                sin(fhi) * cos(phi),
-                cos(fhi),
-                sin(fhi) * sin(phi),
-                (GLfloat)i / (GLfloat)rows,
-                (GLfloat)j / (GLfloat)cols,
-                sin(fhi) * cos(phi),
-                cos(fhi),
-                sin(fhi) * sin(phi),
-            });
+            this->vertices.emplace_back(
+                    glm::vec3(sin(fhi) * cos(phi), cos(fhi), sin(fhi) * sin(phi)),
+                    glm::vec2((GLfloat)i / (GLfloat)rows, (GLfloat)j / (GLfloat)cols),
+                    glm::vec3(sin(fhi) * cos(phi), cos(fhi), sin(fhi) * sin(phi))
+                    );
             if (i == rows || j == cols) continue;
             this->indices.insert(this->indices.end(), {
                 (GLuint)i * (cols + 1) + j,
