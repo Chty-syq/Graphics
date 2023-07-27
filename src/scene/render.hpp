@@ -22,7 +22,6 @@
 #include "framework/depth_buffer.hpp"
 #include "scene/resources.hpp"
 #include "scene/scene.hpp"
-#include "scene/cursor.hpp"
 #include "scene/gui.hpp"
 #include "scene/status.hpp"
 #include "common/defs.hpp"
@@ -39,7 +38,6 @@ namespace GraphRender {
     int window_pos_y;
 
     OperateMode mode = OperateMode::roaming;
-    shared_ptr<CursorManager> cursor = std::make_shared<CursorManager>();
 
     void UpdateState();
     void Display();
@@ -98,10 +96,6 @@ void GraphRender::KeyboardInput() {
 }
 
 void GraphRender::KeyboardCallback(GLFWwindow* window_, int key, int scancode, int action, int mods) {
-//    if (key == GLFW_KEY_B && action == GLFW_PRESS) {
-//        ResourceManager::shader_object->Use();
-//        ResourceManager::shader_object->SetAttribute("blinn", blinn = !blinn);
-//    }
     if (key == GLFW_KEY_LEFT_ALT || key == GLFW_KEY_RIGHT_ALT && action == GLFW_PRESS) {
         switch (mode) {
             case roaming:
