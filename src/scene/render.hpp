@@ -24,6 +24,7 @@
 #include "scene/scene.hpp"
 #include "scene/cursor.hpp"
 #include "scene/gui.hpp"
+#include "scene/status.hpp"
 #include "common/defs.hpp"
 
 #define keydown(x) (glfwGetKey(window, x) == GLFW_PRESS)
@@ -37,8 +38,7 @@ namespace GraphRender {
     int window_pos_x;
     int window_pos_y;
 
-    bool blinn = false;
-
+    OperateMode mode = OperateMode::roaming;
     shared_ptr<CursorManager> cursor = std::make_shared<CursorManager>();
 
     void UpdateState();
@@ -66,7 +66,7 @@ void GraphRender::Init() {
 
     glfwGetWindowPos(window, &window_pos_x, &window_pos_y);
     glfwMakeContextCurrent(window);
-    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
     glfwSetKeyCallback(window, KeyboardCallback);
     glfwSetCursorPosCallback(window, MouseMoveCallback);
@@ -78,7 +78,6 @@ void GraphRender::Init() {
 
     ResourceManager::Init();
     GraphScene::LoadScene();
-    GUI::Init(window);
     frame_buffer->Init();
     depth_buffer->Init();
 }
@@ -99,25 +98,33 @@ void GraphRender::KeyboardInput() {
 }
 
 void GraphRender::KeyboardCallback(GLFWwindow* window_, int key, int scancode, int action, int mods) {
-    if (key == GLFW_KEY_B && action == GLFW_PRESS) {
-        ResourceManager::shader_object->Use();
-        ResourceManager::shader_object->SetAttribute("blinn", blinn = !blinn);
+//    if (key == GLFW_KEY_B && action == GLFW_PRESS) {
+//        ResourceManager::shader_object->Use();
+//        ResourceManager::shader_object->SetAttribute("blinn", blinn = !blinn);
+//    }
+    if (key == GLFW_KEY_LEFT_ALT || key == GLFW_KEY_RIGHT_ALT && action == GLFW_PRESS) {
+        switch (mode) {
+            case roaming:
+                mode = OperateMode::control;
+                glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+                break;
+            case control:
+                mode = OperateMode::roaming;
+                glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+                break;
+        }
     }
 }
 
 void GraphRender::MouseMoveCallback(GLFWwindow* window_, double pos_x, double pos_y) {
-    int center_pos_x = window_pos_x + (int)(SCREEN_WIDTH >> 1);
-    int center_pos_y = window_pos_y + (int)(SCREEN_HEIGHT >> 1);
-    double offset_x = pos_x - (SCREEN_WIDTH >> 1);
-    double offset_y = (SCREEN_HEIGHT >> 1) - pos_y;
-    camera->MouseMove((float)offset_x, (float)offset_y);
-    cursor->SetCursorPosLinux(center_pos_x, center_pos_y);
-//    static double last_x = 0.0, last_y = 0.0;
-//    double offset_x = pos_x - last_x;
-//    double offset_y = last_y - pos_y;
-//    camera->MouseMove((float)offset_x, (float)offset_y);
-//    last_x = pos_x;
-//    last_y = pos_y;
+    if (mode == OperateMode::roaming) {
+        static double last_x = 0.0, last_y = 0.0;
+        double offset_x = pos_x - last_x;
+        double offset_y = last_y - pos_y;
+        camera->MouseMove((float)offset_x, (float)offset_y);
+        last_x = pos_x;
+        last_y = pos_y;
+    }
 }
 
 void GraphRender::MouseScrollCallback(GLFWwindow* window_, double offset_x, double offset_y) {
@@ -131,11 +138,11 @@ void GraphRender::UpdateState() {
     ++frame_cnt;
     double current_time = glfwGetTime();
     if (current_time - previous_time >= 1.0) {
-        GUI::fps = frame_cnt;
+        SceneStatus::fps = frame_cnt;
         frame_cnt = 0;
         previous_time = current_time;
     }
-    auto title = "Graphic - " + std::to_string(GUI::fps) + "FPS";
+    auto title = "Graphic - " + std::to_string(SceneStatus::fps) + "FPS";
     glfwSetWindowTitle(window, title.c_str());
 }
 
@@ -168,6 +175,7 @@ void GraphRender::Display() {
     ResourceManager::shader_object->SetAttribute("projection", projection);
     ResourceManager::shader_object->SetAttribute("fLightSpot.sDirection", camera->GetFront());
     ResourceManager::shader_object->SetAttribute("fLightSpot.sLightPoint.pPosition", camera->GetPosition());
+    ResourceManager::shader_object->SetAttribute("blinn", SceneStatus::blinn);
 
     ResourceManager::shader_skybox->Use();
     ResourceManager::shader_skybox->SetAttribute("view", glm::mat4(glm::mat3(view)));
@@ -187,7 +195,7 @@ void GraphRender::Render() {
         glfwPollEvents();
         KeyboardInput();
         Display();
-        //GUI::Render();
+        GUI::Render();
         glfwSwapBuffers(window);
     }
     glfwTerminate();

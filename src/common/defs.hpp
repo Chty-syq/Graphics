@@ -44,3 +44,7 @@ enum Direction {
 enum GameObjectType {
     sprite, model
 };
+
+enum OperateMode {
+    roaming, control
+};

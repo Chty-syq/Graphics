@@ -6,10 +6,9 @@
 #include "imgui.h"
 #include "imgui_impl_opengl3.h"
 #include "imgui_impl_glfw.h"
-#include "scene/render.hpp"
+#include "scene/status.hpp"
 
 namespace GUI {
-    int fps = 0;
     void Init(GLFWwindow* window);
     void Render();
 }
@@ -18,6 +17,7 @@ void GUI::Init(GLFWwindow* window) {
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
     auto io = ImGui::GetIO();  (void)io;
+    io.MouseDrawCursor = false;
     ImGui::StyleColorsDark();
 
     ImGui_ImplGlfw_InitForOpenGL(window, true);
@@ -30,7 +30,7 @@ void GUI::Render() {
     ImGui::NewFrame();
 
     ImGui::Begin("Console");
-    ImGui::Text("fps: %d", fps);
+    ImGui::Checkbox("Blinn-Phong", &SceneStatus::blinn);
 
     ImGui::End();
     ImGui::Render();
