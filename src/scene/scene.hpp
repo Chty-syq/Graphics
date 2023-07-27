@@ -22,7 +22,7 @@ namespace GraphScene {
 void GraphScene::LoadScene() {
     skybox = std::make_shared<GameObject>(std::make_shared<Cube>("skybox"), glm::vec3(0.0f));
     auto cube = std::make_shared<GameObject>(
-            std::make_shared<Cone>("container", "container_spec"),
+            std::make_shared<Square>("brickwall"),
             glm::vec3(3.0f, 1.0f, 3.0f),
             glm::vec3(1.0f),
             glm::vec3(glm::radians(90.0f))

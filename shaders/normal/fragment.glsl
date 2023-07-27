@@ -11,7 +11,8 @@ out vec4 color;
 
 struct Material {               //材质
     sampler2D mDiffuse;
-    sampler2D mSpecular;
+    sampler2D mSpecular;        //高光贴图
+    sampler2D mNormal;          //法线贴图
     float mShininess;
 };
 struct LightFactor {            //光照因子
@@ -116,6 +117,8 @@ vec3 GetLightSpot(LightSpot light, vec3 norm) {
 }
 
 void main() {
+//    vec3 norm = texture(material.mNormal, fTexCoord).rgb;
+//    norm = normalize(norm * 2.0 - 1.0);
     vec3 norm = normalize(fNormal);                     //法线
     vec3 viewDir = normalize(fViewPos - fPosition);     //视角方向
 

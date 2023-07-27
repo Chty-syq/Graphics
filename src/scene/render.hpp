@@ -108,18 +108,18 @@ void GraphRender::KeyboardCallback(GLFWwindow* window_, int key, int scancode, i
 }
 
 void GraphRender::MouseMoveCallback(GLFWwindow* window_, double pos_x, double pos_y) {
-//    int center_pos_x = window_pos_x + (int)(SCREEN_WIDTH >> 1);
-//    int center_pos_y = window_pos_y + (int)(SCREEN_HEIGHT >> 1);
-//    double offset_x = pos_x - (SCREEN_WIDTH >> 1);
-//    double offset_y = (SCREEN_HEIGHT >> 1) - pos_y;
-//    camera->MouseMove((float)offset_x, (float)offset_y);
-//    cursor->SetCursorPosLinux(center_pos_x, center_pos_y);
-    static double last_x = 0.0, last_y = 0.0;
-    double offset_x = pos_x - last_x;
-    double offset_y = last_y - pos_y;
+    int center_pos_x = window_pos_x + (int)(SCREEN_WIDTH >> 1);
+    int center_pos_y = window_pos_y + (int)(SCREEN_HEIGHT >> 1);
+    double offset_x = pos_x - (SCREEN_WIDTH >> 1);
+    double offset_y = (SCREEN_HEIGHT >> 1) - pos_y;
     camera->MouseMove((float)offset_x, (float)offset_y);
-    last_x = pos_x;
-    last_y = pos_y;
+    cursor->SetCursorPosLinux(center_pos_x, center_pos_y);
+//    static double last_x = 0.0, last_y = 0.0;
+//    double offset_x = pos_x - last_x;
+//    double offset_y = last_y - pos_y;
+//    camera->MouseMove((float)offset_x, (float)offset_y);
+//    last_x = pos_x;
+//    last_y = pos_y;
 }
 
 void GraphRender::MouseScrollCallback(GLFWwindow* window_, double offset_x, double offset_y) {
@@ -137,6 +137,8 @@ void GraphRender::UpdateState() {
         frame_cnt = 0;
         previous_time = current_time;
     }
+    auto title = "Graphic - " + std::to_string(GUI::fps) + "FPS";
+    glfwSetWindowTitle(window, title.c_str());
 }
 
 void GraphRender::Display() {
