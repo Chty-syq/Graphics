@@ -165,7 +165,7 @@ void ResourceManager::LoadShaderObject() {
     shader_fireworks = std::make_shared<Shader>(fs::current_path().parent_path() / "shaders" / "fireworks");
     shader_fireworks->Use();
     shader_fireworks->SetTFOVarying({"fPosition", "fVelocity", "fType", "fLifetime"});
-    shader_fireworks->SetAttribute("gLifetimeLauncher", 100.0f);
+    shader_fireworks->SetAttribute("gLifetimeLauncher", 1000.0f);
     shader_fireworks->SetAttribute("gLifetimeShell", 2000.0f);
     shader_fireworks->SetAttribute("gLifetimeSecShell", 500.0f);
     shader_fireworks->SetAttribute("gRandomMap", 0);

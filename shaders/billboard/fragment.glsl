@@ -8,7 +8,7 @@ uniform sampler2D fTexture;
 
 void main() {
     color = texture(fTexture, fTexCoord);
-    if (color.r >= 0.9f && color.g >= 0.9f && color.b >= 0.9f) {
+    if (all(lessThan(color.rgb, vec3(0.1f))) || all(greaterThan(color.rgb, vec3(0.9f))) || color.a < 0.2f) {
         discard;
     }
 }

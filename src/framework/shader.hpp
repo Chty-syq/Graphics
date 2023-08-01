@@ -167,10 +167,10 @@ void Shader::SetLightSpot(LightSpot light) const {
 }
 
 void Shader::SetTFOVarying(const vector<std::string>& names) {
-    vector<char*> c_names;
+    vector<char*> varyings;
     for(const auto & name : names) {
-        c_names.push_back(const_cast<char*>(name.c_str()));
+        varyings.push_back(const_cast<char*>(name.c_str()));
     }
-    glTransformFeedbackVaryings(this->program, (int)names.size(), &c_names[0], GL_INTERLEAVED_ATTRIBS);
+    glTransformFeedbackVaryings(this->program, (int)varyings.size(), &varyings[0], GL_INTERLEAVED_ATTRIBS);
     this->LinkProgram();
 }

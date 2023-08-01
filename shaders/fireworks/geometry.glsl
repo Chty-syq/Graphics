@@ -64,7 +64,7 @@ void UpdateShell() {
         EmitVertex();
         EndPrimitive();
     } else { //分裂
-        for(int i = 0; i < 10; ++i) {
+        for(int i = 0; i < 20; ++i) {
             vec3 direction = GetRandomDirection((gTime + i) / 1000.0);
             fPosition = gPosition[0];
             fVelocity = normalize(direction) * 20.0f;
