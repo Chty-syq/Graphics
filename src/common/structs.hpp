@@ -14,6 +14,13 @@ struct Vertex {
     Vertex(glm::vec3 position, glm::vec2 tex_coord, glm::vec3 normal): position(position), tex_coord(tex_coord), normal(normal) {}
 };
 
+struct Particle {
+    glm::vec3   position;
+    glm::vec3   velocity;
+    GLfloat     type;
+    GLfloat     lifetime;
+};
+
 struct LightFactor {
     glm::vec3   ambient;
     glm::vec3   diffuse;

@@ -14,16 +14,17 @@
 class Shader {
 private:
     GLuint program;
-    GLuint v_shader_id;
-    GLuint f_shader_id;
     static std::string LoadGLSLCode(const std::string& path);
     static void LoadShader(GLuint shader_id, const std::string& path);
-    void LoadProgram() const;
+    void LoadProgram(GLuint v_shader_id, GLuint f_shader_id) const;
+    void LoadProgram(GLuint v_shader_id, GLuint f_shader_id, GLuint g_shader_id) const;
+    void LinkProgram() const;
 
 public:
     explicit Shader(const std::string& path);
     ~Shader() = default;
     void Use() const;
+    void SetTFOVarying(const vector<std::string>& names);
     void SetAttribute(const std::string &name, int value) const;
     void SetAttribute(const std::string &name, float value) const;
     void SetAttribute(const std::string &name, const glm::vec3 &value) const;
@@ -35,11 +36,26 @@ public:
 
 Shader::Shader(const std::string& path) {
     program = glCreateProgram();
-    v_shader_id = glCreateShader(GL_VERTEX_SHADER);
-    f_shader_id = glCreateShader(GL_FRAGMENT_SHADER);
-    LoadShader(v_shader_id, path + "/vertex.glsl");
-    LoadShader(f_shader_id, path + "/fragment.glsl");
-    LoadProgram();
+    fs::path v_shader_path(path + "/vertex.glsl");
+    fs::path f_shader_path(path + "/fragment.glsl");
+    fs::path g_shader_path(path + "/geometry.glsl");
+    if (!exists(v_shader_path) || !exists(f_shader_path)) {
+        throw std::runtime_error("[ERROR] Unexpected shader path!");
+    }
+    auto v_shader_id = glCreateShader(GL_VERTEX_SHADER);
+    auto f_shader_id = glCreateShader(GL_FRAGMENT_SHADER);
+    LoadShader(v_shader_id, v_shader_path);
+    LoadShader(f_shader_id, f_shader_path);
+
+    if (exists(g_shader_path)) {
+        auto g_shader_id = glCreateShader(GL_GEOMETRY_SHADER);
+        LoadShader(g_shader_id, g_shader_path);
+        LoadProgram(v_shader_id, f_shader_id, g_shader_id);
+    }
+    else {
+        LoadProgram(v_shader_id, f_shader_id);
+    }
+
 }
 
 std::string Shader::LoadGLSLCode(const std::string& path) {
@@ -74,15 +90,24 @@ void Shader::LoadShader(GLuint shader_id, const std::string& path) {
     }
 }
 
-void Shader::LoadProgram() const {
+void Shader::LoadProgram(GLuint v_shader_id, GLuint f_shader_id) const {
     glAttachShader(program, v_shader_id);
     glAttachShader(program, f_shader_id);
     glDeleteShader(v_shader_id);
     glDeleteShader(f_shader_id);
-    glLinkProgram(program);
+    this->LinkProgram();
+}
 
+void Shader::LoadProgram(GLuint v_shader_id, GLuint f_shader_id, GLuint g_shader_id) const {
+    glAttachShader(program, g_shader_id);
+    glDeleteShader(g_shader_id);
+    LoadProgram(v_shader_id, f_shader_id);
+}
+
+void Shader::LinkProgram() const {
     int success;
     char infoLog[512];
+    glLinkProgram(program);
     glGetProgramiv(program, GL_LINK_STATUS, &success);
     if (!success)
     {
@@ -139,4 +164,13 @@ void Shader::SetLightSpot(LightSpot light) const {
     this->SetAttribute("fLightSpot.sLightPoint.pFactor.fAmbient", light.light_point.factor.ambient);
     this->SetAttribute("fLightSpot.sLightPoint.pFactor.fDiffuse", light.light_point.factor.diffuse);
     this->SetAttribute("fLightSpot.sLightPoint.pFactor.fSpecular", light.light_point.factor.specular);
+}
+
+void Shader::SetTFOVarying(const vector<std::string>& names) {
+    vector<char*> c_names;
+    for(const auto & name : names) {
+        c_names.push_back(const_cast<char*>(name.c_str()));
+    }
+    glTransformFeedbackVaryings(this->program, (int)names.size(), &c_names[0], GL_INTERLEAVED_ATTRIBS);
+    this->LinkProgram();
 }

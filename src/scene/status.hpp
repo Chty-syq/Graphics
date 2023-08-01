@@ -6,6 +6,5 @@
 
 namespace SceneStatus {
     int fps = 0;
-
     bool blinn = false;
 }

@@ -20,6 +20,8 @@
 #include "framework/game_object.hpp"
 #include "framework/frame_buffer.hpp"
 #include "framework/depth_buffer.hpp"
+#include "framework/billboard.hpp"
+#include "framework/particle_system.hpp"
 #include "scene/resources.hpp"
 #include "scene/scene.hpp"
 #include "scene/gui.hpp"
@@ -34,12 +36,10 @@ namespace GraphRender {
     unique_ptr<FrameBuffer> frame_buffer = std::make_unique<FrameBuffer>();
     unique_ptr<DepthBuffer> depth_buffer = std::make_unique<DepthBuffer>();
 
-    int window_pos_x;
-    int window_pos_y;
-
     OperateMode mode = OperateMode::roaming;
 
     void UpdateState();
+    void SetShaderProperties();
     void Display();
     void KeyboardInput();
     void KeyboardCallback(GLFWwindow* window_, int key, int scancode, int action, int mods);
@@ -52,7 +52,7 @@ namespace GraphRender {
 
 void GraphRender::Init() {
     glfwInit();
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
@@ -62,10 +62,11 @@ void GraphRender::Init() {
         throw std::runtime_error("Unexpected Behavior Creating GLFW Window!");
     }
 
-    glfwGetWindowPos(window, &window_pos_x, &window_pos_y);
     glfwMakeContextCurrent(window);
-    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-
+    switch (mode) {
+        case roaming: glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED); break;
+        case control: glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL); break;
+    }
     glfwSetKeyCallback(window, KeyboardCallback);
     glfwSetCursorPosCallback(window, MouseMoveCallback);
     glfwSetScrollCallback(window, MouseScrollCallback);
@@ -140,6 +141,26 @@ void GraphRender::UpdateState() {
     glfwSetWindowTitle(window, title.c_str());
 }
 
+void GraphRender::SetShaderProperties() {
+    auto view = camera->GetViewMat();
+    auto projection = glm::perspective(glm::radians(camera->GetZoom()), (GLfloat)SCREEN_WIDTH / (GLfloat)SCREEN_HEIGHT, 0.1f, 100.0f);
+    ResourceManager::shader_object->Use();
+    ResourceManager::shader_object->SetAttribute("view", view);
+    ResourceManager::shader_object->SetAttribute("projection", projection);
+    ResourceManager::shader_object->SetAttribute("fLightSpot.sDirection", camera->GetFront());
+    ResourceManager::shader_object->SetAttribute("fLightSpot.sLightPoint.pPosition", camera->GetPosition());
+    ResourceManager::shader_object->SetAttribute("blinn", SceneStatus::blinn);
+
+    ResourceManager::shader_skybox->Use();
+    ResourceManager::shader_skybox->SetAttribute("view", glm::mat4(glm::mat3(view)));
+    ResourceManager::shader_skybox->SetAttribute("projection", projection);
+
+    ResourceManager::shader_billboard->Use();
+    ResourceManager::shader_billboard->SetAttribute("view", view);
+    ResourceManager::shader_billboard->SetAttribute("projection", projection);
+    ResourceManager::shader_billboard->SetAttribute("cameraPos", camera->GetPosition());
+}
+
 void GraphRender::Display() {
     glEnable(GL_DEPTH_TEST);
     //glEnable(GL_FRAMEBUFFER_SRGB); //gamma校正
@@ -162,21 +183,12 @@ void GraphRender::Display() {
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    auto view = camera->GetViewMat();
-    auto projection = glm::perspective(glm::radians(camera->GetZoom()), (GLfloat)SCREEN_WIDTH / (GLfloat)SCREEN_HEIGHT, 0.1f, 100.0f);
-    ResourceManager::shader_object->Use();
-    ResourceManager::shader_object->SetAttribute("view", view);
-    ResourceManager::shader_object->SetAttribute("projection", projection);
-    ResourceManager::shader_object->SetAttribute("fLightSpot.sDirection", camera->GetFront());
-    ResourceManager::shader_object->SetAttribute("fLightSpot.sLightPoint.pPosition", camera->GetPosition());
-    ResourceManager::shader_object->SetAttribute("blinn", SceneStatus::blinn);
-
-    ResourceManager::shader_skybox->Use();
-    ResourceManager::shader_skybox->SetAttribute("view", glm::mat4(glm::mat3(view)));
-    ResourceManager::shader_skybox->SetAttribute("projection", projection);
+    SetShaderProperties();
 
     GraphScene::RenderSkybox(ResourceManager::shader_skybox);
     GraphScene::RenderObjects(ResourceManager::shader_object);
+    //GraphScene::RenderBillBoard(ResourceManager::shader_billboard);
+    GraphScene::RenderParticleSystem(ResourceManager::shader_fireworks, ResourceManager::shader_billboard);
 
     //depth_buffer->Render();
     frame_buffer->Render();

@@ -15,14 +15,21 @@
 namespace GraphScene {
     vector<shared_ptr<GameObject>> objects;
     shared_ptr<GameObject> skybox;
+    shared_ptr<Billboard> board;
+    shared_ptr<ParticleSystem> fireworks;
 
     void LoadScene();
     void RenderSkybox(shared_ptr<Shader>& shader);
     void RenderObjects(shared_ptr<Shader>& shader);
+    void RenderBillBoard(shared_ptr<Shader>& shader);
+    void RenderParticleSystem(shared_ptr<Shader>& shader_update, shared_ptr<Shader>& shader_render);
 }
 
 void GraphScene::LoadScene() {
     skybox = std::make_shared<GameObject>(std::make_shared<Cube>("skybox"), glm::vec3(0.0f));
+    board = std::make_shared<Billboard>("brickwall");
+    fireworks = std::make_shared<ParticleSystem>(glm::vec3(15.0f, 0.1f, 15.0f), "fireworks_red");
+
     auto cube = std::make_shared<GameObject>(
             std::make_shared<Cone>("brickwall"),
             glm::vec3(3.0f, 1.0f, 3.0f),
@@ -68,4 +75,12 @@ void GraphScene::RenderObjects(shared_ptr<Shader>& shader) {
     for(auto & object : objects) {
         object->Draw(shader);
     }
+}
+
+void GraphScene::RenderBillBoard(shared_ptr<Shader>& shader) {
+    board->Render(shader);
+}
+
+void GraphScene::RenderParticleSystem(shared_ptr<Shader>& shader_update, shared_ptr<Shader>& shader_render) {
+    fireworks->Render(shader_update, shader_render);
 }

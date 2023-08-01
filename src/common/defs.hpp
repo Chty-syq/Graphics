@@ -37,6 +37,9 @@ const float CAMERA_SPEED = 3.0;
 const float CAMERA_SENSITIVITY = 0.1;
 const float CAMERA_ZOOM = 45.0;
 
+const GLuint PARTICLE_NUM = 1000;
+
+
 enum Direction {
     forward, backward, left, right, up, down
 };

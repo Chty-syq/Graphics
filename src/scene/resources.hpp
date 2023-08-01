@@ -16,6 +16,8 @@ namespace ResourceManager {
     shared_ptr<Shader> shader_skybox;
     shared_ptr<Shader> shader_screen;
     shared_ptr<Shader> shader_depth;
+    shared_ptr<Shader> shader_billboard;
+    shared_ptr<Shader> shader_fireworks;
 
     LightParal light_paral;
     vector<LightPoint> light_points;
@@ -154,4 +156,17 @@ void ResourceManager::LoadShaderObject() {
     shader_depth = std::make_shared<Shader>(fs::current_path().parent_path() / "shaders" / "depth");
     shader_depth->Use();
     shader_depth->SetAttribute("mLightSpace", projection * view);
+
+    shader_billboard = std::make_shared<Shader>(fs::current_path().parent_path() / "shaders" / "billboard");
+    shader_billboard->Use();
+    shader_billboard->SetAttribute("fTexture", 0);
+    shader_billboard->SetAttribute("size", 0.3f);
+
+    shader_fireworks = std::make_shared<Shader>(fs::current_path().parent_path() / "shaders" / "fireworks");
+    shader_fireworks->Use();
+    shader_fireworks->SetTFOVarying({"fPosition", "fVelocity", "fType", "fLifetime"});
+    shader_fireworks->SetAttribute("gLifetimeLauncher", 100.0f);
+    shader_fireworks->SetAttribute("gLifetimeShell", 2000.0f);
+    shader_fireworks->SetAttribute("gLifetimeSecShell", 500.0f);
+    shader_fireworks->SetAttribute("gRandomMap", 0);
 }
