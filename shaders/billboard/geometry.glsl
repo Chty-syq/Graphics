@@ -3,12 +3,15 @@
 layout (points) in;
 layout (triangle_strip, max_vertices = 4) out;
 
+in vec4 gColor[];
+
+out vec2 fTexCoord;
+out vec4 fColor;
+
 uniform mat4 projection;
 uniform mat4 view;
 uniform vec3 cameraPos;
 uniform float size;
-
-out vec2 fTexCoord;
 
 void main() {
     vec3 position = gl_in[0].gl_Position.xyz;
@@ -21,6 +24,7 @@ void main() {
         for(int j = 0; j < 2; ++j) {
             gl_Position = projection * view * vec4(position + ((i - 0.5) * right + j * up) * size, 1.0);
             fTexCoord = vec2(i, j);
+            fColor = gColor[0];
             EmitVertex();
         }
     }

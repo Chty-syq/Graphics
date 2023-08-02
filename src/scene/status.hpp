@@ -5,6 +5,9 @@
 #pragma once
 
 namespace SceneStatus {
-    int fps = 0;
     bool blinn = false;
+
+    float previous_time = 0.0f;
+    float current_time = 0.0f;
+    int fps = 0;
 }

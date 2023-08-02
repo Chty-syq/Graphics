@@ -6,6 +6,7 @@
 
 #include "glm/vec3.hpp"
 #include "glm/vec2.hpp"
+#include "glm/vec4.hpp"
 
 struct Vertex {
     glm::vec3   position;
@@ -17,8 +18,10 @@ struct Vertex {
 struct Particle {
     glm::vec3   position;
     glm::vec3   velocity;
+    glm::vec4   color;
     GLfloat     type;
     GLfloat     lifetime;
+    GLfloat     tag;
 };
 
 struct LightFactor {

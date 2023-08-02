@@ -28,7 +28,7 @@ namespace GraphScene {
 void GraphScene::LoadScene() {
     skybox = std::make_shared<GameObject>(std::make_shared<Cube>("skybox"), glm::vec3(0.0f));
     board = std::make_shared<Billboard>("brickwall");
-    fireworks = std::make_shared<ParticleSystem>(glm::vec3(15.0f, 0.1f, 15.0f), "fireworks_red");
+    fireworks = std::make_shared<ParticleSystem>(glm::vec3(15.0f, 0.1f, 15.0f), "star_02");
 
     auto cube = std::make_shared<GameObject>(
             std::make_shared<Cone>("brickwall"),

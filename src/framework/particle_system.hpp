@@ -4,6 +4,7 @@
 
 #pragma once
 #include "framework/texture_random.hpp"
+#include "scene/status.hpp"
 
 class ParticleSystem {
 private:
@@ -31,9 +32,11 @@ ParticleSystem::ParticleSystem(glm::vec3 position, const std::string& texture) {
     vector<Particle> particles(PARTICLE_NUM);
     particles[0] = {
             .position = glm::vec3(position),
-            .velocity = glm::vec3(0.0f, 0.0001f, 0.0f),
+            .velocity = glm::vec3(0.0f, 0.01f, 0.0f),
+            .color = glm::vec4(0.5f, 0.3f, 0.1f, 1.0f),
             .type = 0,
-            .lifetime = 0.0f
+            .lifetime = 0.0f,
+            .tag = 0.0f
     };
 
     glGenVertexArrays(2, vao);
@@ -60,14 +63,11 @@ void ParticleSystem::Render(shared_ptr<Shader>& shader_update, shared_ptr<Shader
 }
 
 void ParticleSystem::UpdateParticles(shared_ptr<Shader>& shader) {
-    static double previous_time = 0.0f;
-    auto current_time = (float)glfwGetTime();
-    auto duration = (float)(current_time - previous_time);
-    previous_time = current_time;
+    float duration = SceneStatus::current_time - SceneStatus::previous_time;
 
     shader->Use();
-    shader->SetAttribute("gTime", current_time * 1000);
-    shader->SetAttribute("gDeltaTime", duration * 1000);
+    shader->SetAttribute("gTime", SceneStatus::current_time);
+    shader->SetAttribute("gDeltaTime", duration);
     this->texture_rd->Bind(0);
 
     glEnable(GL_RASTERIZER_DISCARD);   //取消光栅化
@@ -80,10 +80,14 @@ void ParticleSystem::UpdateParticles(shared_ptr<Shader>& shader) {
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Particle), (void*)(3 * sizeof(float)));
     glEnableVertexAttribArray(1);
-    glVertexAttribPointer(2, 1, GL_FLOAT, GL_FALSE, sizeof(Particle), (void*)(6 * sizeof(float)));
+    glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, sizeof(Particle), (void*)(6 * sizeof(float)));
     glEnableVertexAttribArray(2);
-    glVertexAttribPointer(3, 1, GL_FLOAT, GL_FALSE, sizeof(Particle), (void*)(7 * sizeof(float)));
+    glVertexAttribPointer(3, 1, GL_FLOAT, GL_FALSE, sizeof(Particle), (void*)(10 * sizeof(float)));
     glEnableVertexAttribArray(3);
+    glVertexAttribPointer(4, 1, GL_FLOAT, GL_FALSE, sizeof(Particle), (void*)(11 * sizeof(float)));
+    glEnableVertexAttribArray(4);
+    glVertexAttribPointer(5, 1, GL_FLOAT, GL_FALSE, sizeof(Particle), (void*)(12 * sizeof(float)));
+    glEnableVertexAttribArray(5);
 
     glBeginTransformFeedback(GL_POINTS);
     static bool is_first = true;
@@ -108,6 +112,8 @@ void ParticleSystem::RenderParticles(shared_ptr<Shader>& shader) {
 
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Particle), (void*)0);
     glEnableVertexAttribArray(0);
+    glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(Particle), (void*)(6 * sizeof(float)));
+    glEnableVertexAttribArray(1);
 
     glDrawArrays(GL_POINTS, 0, 1);
     glDrawTransformFeedback(GL_POINTS, tfo[cur^1]);

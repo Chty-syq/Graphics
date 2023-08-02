@@ -38,7 +38,8 @@ namespace GraphRender {
 
     OperateMode mode = OperateMode::roaming;
 
-    void UpdateState();
+    void UpdateStateBegin();
+    void UpdateStateEnd();
     void SetShaderProperties();
     void Display();
     void KeyboardInput();
@@ -82,9 +83,7 @@ void GraphRender::Init() {
 }
 
 void GraphRender::KeyboardInput() {
-    static double previous_time = glfwGetTime();
-    auto current_time = glfwGetTime();
-    auto duration = (float)(current_time - previous_time);
+    float duration = SceneStatus::current_time - SceneStatus::previous_time;
     if (keydown(GLFW_KEY_W))  camera->KeyboardInput(Direction::forward, duration);
     if (keydown(GLFW_KEY_S))  camera->KeyboardInput(Direction::backward, duration);
     if (keydown(GLFW_KEY_A))  camera->KeyboardInput(Direction::left, duration);
@@ -93,7 +92,6 @@ void GraphRender::KeyboardInput() {
     if (keydown(GLFW_KEY_E))  camera->KeyboardInput(Direction::down, duration);
 
     if (keydown(GLFW_KEY_ESCAPE)) glfwSetWindowShouldClose(window, true);
-    previous_time = current_time;
 }
 
 void GraphRender::KeyboardCallback(GLFWwindow* window_, int key, int scancode, int action, int mods) {
@@ -126,19 +124,23 @@ void GraphRender::MouseScrollCallback(GLFWwindow* window_, double offset_x, doub
     camera->MouseScroll((float)offset_y);
 }
 
-void GraphRender::UpdateState() {
-    static int frame_cnt = 0;
-    static double previous_time = glfwGetTime();
+void GraphRender::UpdateStateBegin() {
+    SceneStatus::current_time = (float)glfwGetTime();
+    float duration = SceneStatus::current_time - SceneStatus::previous_time;
 
-    ++frame_cnt;
-    double current_time = glfwGetTime();
-    if (current_time - previous_time >= 1.0) {
-        SceneStatus::fps = frame_cnt;
-        frame_cnt = 0;
-        previous_time = current_time;
+    static float timer = 0.0f;
+    static int frames = 0;
+    if (++frames && (timer += duration) > 1.0f) {
+        SceneStatus::fps = frames;
+        timer -= 1.0f;
+        frames = 0;
     }
     auto title = "Graphic - " + std::to_string(SceneStatus::fps) + "FPS";
     glfwSetWindowTitle(window, title.c_str());
+}
+
+void GraphRender::UpdateStateEnd() {
+    SceneStatus::previous_time = SceneStatus::current_time;
 }
 
 void GraphRender::SetShaderProperties() {
@@ -197,12 +199,13 @@ void GraphRender::Display() {
 void GraphRender::Render() {
     while(!glfwWindowShouldClose(window))
     {
-        UpdateState();
+        UpdateStateBegin();
         glfwPollEvents();
         KeyboardInput();
         Display();
         GUI::Render();
         glfwSwapBuffers(window);
+        UpdateStateEnd();
     }
     glfwTerminate();
 }
