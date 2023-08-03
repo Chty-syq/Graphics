@@ -6,6 +6,7 @@
 #include <map>
 #include <queue>
 #include "framework/texture.hpp"
+#include "scene/status.hpp"
 #include "common/structs.hpp"
 #include "common/defs.hpp"
 
@@ -17,7 +18,10 @@ namespace ResourceManager {
     shared_ptr<Shader> shader_screen;
     shared_ptr<Shader> shader_depth;
     shared_ptr<Shader> shader_billboard;
-    shared_ptr<Shader> shader_fireworks;
+    shared_ptr<Shader> shader_fireworks_update;
+    shared_ptr<Shader> shader_fireworks_render;
+    shared_ptr<Shader> shader_flame_update;
+    shared_ptr<Shader> shader_flame_render;
 
     LightParal light_paral;
     vector<LightPoint> light_points;
@@ -162,11 +166,32 @@ void ResourceManager::LoadShaderObject() {
     shader_billboard->SetAttribute("fTexture", 0);
     shader_billboard->SetAttribute("size", 0.3f);
 
-    shader_fireworks = std::make_shared<Shader>(fs::current_path().parent_path() / "shaders" / "fireworks");
-    shader_fireworks->Use();
-    shader_fireworks->SetTFOVarying({"fPosition", "fVelocity", "fColor", "fType", "fLifetime", "fTag"});
-    shader_fireworks->SetAttribute("gLifetimeLauncher", 1.0f);
-    shader_fireworks->SetAttribute("gLifetimeShell", 1.0f);
-    shader_fireworks->SetAttribute("gLifetimeSecShell", 2.0f);
-    shader_fireworks->SetAttribute("gRandomMap", 0);
+    shader_fireworks_update = std::make_shared<Shader>(fs::current_path().parent_path() / "shaders" / "particles" / "fireworks" / "update");
+    shader_fireworks_update->Use();
+    shader_fireworks_update->SetTFOVarying({"fPosition", "fVelocity", "fColor", "fType", "fLifetime", "fTag"});
+    shader_fireworks_update->SetAttribute("gLifetimeLauncher", 1.0f);
+    shader_fireworks_update->SetAttribute("gLifetimeShell", 1.0f);
+    shader_fireworks_update->SetAttribute("gLifetimeSecShell", 2.0f);
+    shader_fireworks_update->SetAttribute("gRandomMap", 0);
+
+    shader_fireworks_render = std::make_shared<Shader>(fs::current_path().parent_path() / "shaders" / "particles" / "fireworks" / "render");
+    shader_fireworks_render->Use();
+    shader_fireworks_render->SetAttribute("fTexture", 0);
+    shader_fireworks_render->SetAttribute("size", 0.3f);
+
+    shader_flame_update = std::make_shared<Shader>(fs::current_path().parent_path() / "shaders" / "particles" / "flame" / "update");
+    shader_flame_update->Use();
+    shader_flame_update->SetTFOVarying({"fPosition", "fVelocity", "fAlpha", "fType", "fSize", "fLifetime", "fLifespan"});
+    shader_flame_update->SetAttribute("gRadius", SceneStatus::flame_radius);
+    shader_flame_update->SetAttribute("gCenter", SceneStatus::flame_center);
+    shader_flame_update->SetAttribute("gLifespanMax", SceneStatus::flame_lifetime_max);
+    shader_flame_update->SetAttribute("gLifespanMin", SceneStatus::flame_lifetime_min);
+    shader_flame_update->SetAttribute("gVelocityMax", SceneStatus::flame_velocity_max);
+    shader_flame_update->SetAttribute("gVelocityMin", SceneStatus::flame_velocity_min);
+    shader_flame_update->SetAttribute("gRandomMap", 0);
+
+    shader_flame_render = std::make_shared<Shader>(fs::current_path().parent_path() / "shaders" / "particles" / "flame" / "render");
+    shader_flame_render->Use();
+    shader_flame_render->SetAttribute("fFlameStart", 0);
+    shader_flame_render->SetAttribute("fFlameSpark", 1);
 }

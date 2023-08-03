@@ -7,21 +7,13 @@
 #include "glm/vec3.hpp"
 #include "glm/vec2.hpp"
 #include "glm/vec4.hpp"
+#include <vector>
 
 struct Vertex {
     glm::vec3   position;
     glm::vec2   tex_coord;
     glm::vec3   normal;
     Vertex(glm::vec3 position, glm::vec2 tex_coord, glm::vec3 normal): position(position), tex_coord(tex_coord), normal(normal) {}
-};
-
-struct Particle {
-    glm::vec3   position;
-    glm::vec3   velocity;
-    glm::vec4   color;
-    GLfloat     type;
-    GLfloat     lifetime;
-    GLfloat     tag;
 };
 
 struct LightFactor {

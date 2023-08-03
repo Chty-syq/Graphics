@@ -11,24 +11,28 @@
 #include "framework/sprites/3D/cube.hpp"
 #include "framework/sprites/base.hpp"
 #include "framework/model/model.hpp"
+#include "framework/particle_system/base.hpp"
 
 namespace GraphScene {
     vector<shared_ptr<GameObject>> objects;
     shared_ptr<GameObject> skybox;
     shared_ptr<Billboard> board;
-    shared_ptr<ParticleSystem> fireworks;
+    shared_ptr<ParticleSystem<Fireworks>> fireworks;
+    shared_ptr<ParticleSystem<Flame>> flame;
 
     void LoadScene();
     void RenderSkybox(shared_ptr<Shader>& shader);
     void RenderObjects(shared_ptr<Shader>& shader);
     void RenderBillBoard(shared_ptr<Shader>& shader);
-    void RenderParticleSystem(shared_ptr<Shader>& shader_update, shared_ptr<Shader>& shader_render);
+    void RenderParticleSystem();
 }
 
 void GraphScene::LoadScene() {
     skybox = std::make_shared<GameObject>(std::make_shared<Cube>("skybox"), glm::vec3(0.0f));
     board = std::make_shared<Billboard>("brickwall");
-    fireworks = std::make_shared<ParticleSystem>(glm::vec3(15.0f, 0.1f, 15.0f), "star_02");
+
+    fireworks = std::make_shared<ParticleSystem<Fireworks>>(glm::vec3(15.0f, 0.1f, 15.0f), "star_02");
+    flame = std::make_shared<ParticleSystem<Flame>>(SceneStatus::flame_center, "flame");
 
     auto cube = std::make_shared<GameObject>(
             std::make_shared<Cone>("brickwall"),
@@ -81,6 +85,7 @@ void GraphScene::RenderBillBoard(shared_ptr<Shader>& shader) {
     board->Render(shader);
 }
 
-void GraphScene::RenderParticleSystem(shared_ptr<Shader>& shader_update, shared_ptr<Shader>& shader_render) {
-    fireworks->Render(shader_update, shader_render);
+void GraphScene::RenderParticleSystem() {
+    fireworks->Render(ResourceManager::shader_fireworks_update, ResourceManager::shader_fireworks_render);
+    flame->Render(ResourceManager::shader_flame_update, ResourceManager::shader_flame_render);
 }

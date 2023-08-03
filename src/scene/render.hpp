@@ -21,7 +21,6 @@
 #include "framework/frame_buffer.hpp"
 #include "framework/depth_buffer.hpp"
 #include "framework/billboard.hpp"
-#include "framework/particle_system.hpp"
 #include "scene/resources.hpp"
 #include "scene/scene.hpp"
 #include "scene/gui.hpp"
@@ -161,10 +160,31 @@ void GraphRender::SetShaderProperties() {
     ResourceManager::shader_billboard->SetAttribute("view", view);
     ResourceManager::shader_billboard->SetAttribute("projection", projection);
     ResourceManager::shader_billboard->SetAttribute("cameraPos", camera->GetPosition());
+
+    float duration = SceneStatus::current_time - SceneStatus::previous_time;
+    ResourceManager::shader_fireworks_update->Use();
+    ResourceManager::shader_fireworks_update->SetAttribute("gTime", SceneStatus::current_time);
+    ResourceManager::shader_fireworks_update->SetAttribute("gDeltaTime", duration);
+
+    ResourceManager::shader_fireworks_render->Use();
+    ResourceManager::shader_fireworks_render->SetAttribute("view", view);
+    ResourceManager::shader_fireworks_render->SetAttribute("projection", projection);
+    ResourceManager::shader_fireworks_render->SetAttribute("cameraPos", camera->GetPosition());
+
+    ResourceManager::shader_flame_update->Use();
+    ResourceManager::shader_flame_update->SetAttribute("gTime", SceneStatus::current_time);
+    ResourceManager::shader_flame_update->SetAttribute("gDeltaTime", duration);
+
+    ResourceManager::shader_flame_render->Use();
+    ResourceManager::shader_flame_render->SetAttribute("view", view);
+    ResourceManager::shader_flame_render->SetAttribute("projection", projection);
+    ResourceManager::shader_flame_render->SetAttribute("cameraPos", camera->GetPosition());
 }
 
 void GraphRender::Display() {
     glEnable(GL_DEPTH_TEST);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     //glEnable(GL_FRAMEBUFFER_SRGB); //gamma校正
 
     //depth_buffer
@@ -182,7 +202,7 @@ void GraphRender::Display() {
     //color_buffer
     glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
     frame_buffer->Bind();
-    glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+    glClearColor(0.2f, 0.3f, 0.3f, 0.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     SetShaderProperties();
@@ -190,7 +210,7 @@ void GraphRender::Display() {
     GraphScene::RenderSkybox(ResourceManager::shader_skybox);
     GraphScene::RenderObjects(ResourceManager::shader_object);
     //GraphScene::RenderBillBoard(ResourceManager::shader_billboard);
-    GraphScene::RenderParticleSystem(ResourceManager::shader_fireworks, ResourceManager::shader_billboard);
+    GraphScene::RenderParticleSystem();
 
     //depth_buffer->Render();
     frame_buffer->Render();
