@@ -19,19 +19,19 @@ private:
     vector<std::string> textures;
 
     void UpdateParticles(shared_ptr<Shader>& shader);
-    void RenderParticles(shared_ptr<Shader>& shader);
+    void RenderParticles(shared_ptr<Shader>& shader, glm::vec3 position, glm::vec3 rotate);
 
 public:
-    ParticleSystem(glm::vec3 position, const vector<std::string>& textures);
+    explicit ParticleSystem(const vector<std::string>& textures);
     ~ParticleSystem();
-    void Render(shared_ptr<Shader>& shader_update, shared_ptr<Shader>& shader_render);
+    void Render(shared_ptr<Shader>& shader_update, shared_ptr<Shader>& shader_render, glm::vec3 position, glm::vec3 rotate);
 };
 
-template<typename T> ParticleSystem<T>::ParticleSystem(glm::vec3 position, const vector<std::string>& textures) {
+template<typename T> ParticleSystem<T>::ParticleSystem(const vector<std::string>& textures) {
     this->texture_rd = std::make_shared<TextureRandom>(1000);
     this->textures = textures;
 
-    vector<T> particles = T::GetLaunchers(position);
+    vector<T> particles = T::GetLaunchers();
     this->num_launchers = particles.size();
     particles.resize(PARTICLE_NUM);
 
@@ -52,9 +52,9 @@ template<typename T> ParticleSystem<T>::~ParticleSystem() {
     glDeleteBuffers(2, vbo);
 }
 
-template<typename T> void ParticleSystem<T>::Render(shared_ptr<Shader>& shader_update, shared_ptr<Shader>& shader_render) {
+template<typename T> void ParticleSystem<T>::Render(shared_ptr<Shader>& shader_update, shared_ptr<Shader>& shader_render, glm::vec3 position, glm::vec3 rotate) {
     UpdateParticles(shader_update);
-    RenderParticles(shader_render);
+    RenderParticles(shader_render, position, rotate);
     cur ^= 1;
 }
 
@@ -82,8 +82,16 @@ template<typename T> void ParticleSystem<T>::UpdateParticles(shared_ptr<Shader>&
     glBindVertexArray(0);
 }
 
-template<typename T> void ParticleSystem<T>::RenderParticles(shared_ptr<Shader>& shader) {
+template<typename T> void ParticleSystem<T>::RenderParticles(shared_ptr<Shader>& shader, glm::vec3 position, glm::vec3 rotate) {
+    auto model = glm::mat4(1.0f);
+    model = glm::translate(model, position);
+    model = glm::rotate(model, rotate[0], glm::vec3(1.0f, 0.0f, 0.0f));
+    model = glm::rotate(model, rotate[1], glm::vec3(0.0f, 1.0f, 0.0f));
+    model = glm::rotate(model, rotate[2], glm::vec3(0.0f, 0.0f, 1.0f));
+
     shader->Use();
+    shader->SetAttribute("model", model);
+
     for(int i = 0; i < this->textures.size(); ++i) {
         ResourceManager::BindTexture(this->textures[i], i);
     }

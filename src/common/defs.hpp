@@ -44,10 +44,6 @@ enum Direction {
     forward, backward, left, right, up, down
 };
 
-enum GameObjectType {
-    sprite, model
-};
-
 enum OperateMode {
     roaming, control
 };

@@ -43,6 +43,7 @@ namespace ResourceManager {
 void ResourceManager::Init() {
     LoadTexture("", "empty");
     LoadTextures(fs::current_path().parent_path() / "assets" / "textures");
+    LoadTextures(fs::current_path().parent_path() / "assets" / "particles");
     LoadTextureCube(fs::current_path().parent_path() / "assets" / "textures_cube" / "skybox");
     LoadLights();
     LoadShaderObject();

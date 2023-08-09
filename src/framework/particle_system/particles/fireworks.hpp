@@ -11,15 +11,15 @@ struct Fireworks {
     GLfloat     type;
     GLfloat     lifetime;
     GLfloat     tag;
-    static vector<Fireworks> GetLaunchers(glm::vec3 position);
+    static vector<Fireworks> GetLaunchers();
     static void BindUpdateVAO();
     static void BindRenderVAO();
 };
 
-vector<Fireworks> Fireworks::GetLaunchers(glm::vec3 position) {
+vector<Fireworks> Fireworks::GetLaunchers() {
     vector<Fireworks> launchers;
     launchers.push_back({
-        .position = glm::vec3(position),
+        .position = glm::vec3(0.0f),
         .velocity = glm::vec3(0.0f, 0.01f, 0.0f),
         .color = glm::vec4(0.5f, 0.3f, 0.1f, 1.0f),
         .type = 0,

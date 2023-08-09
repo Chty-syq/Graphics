@@ -14,12 +14,12 @@ struct Flame {
     float size;
     float lifetime;
     float lifespan;
-    static vector<Flame> GetLaunchers(glm::vec3 position);
+    static vector<Flame> GetLaunchers();
     static void BindUpdateVAO();
     static void BindRenderVAO();
 };
 
-vector<Flame> Flame::GetLaunchers(glm::vec3 position) {
+vector<Flame> Flame::GetLaunchers() {
     vector<Flame> launchers;
     std::normal_distribution<float> dist(0, SceneStatus::flame_radius);
     for(int i = 0; i < 10000; ++i) {
