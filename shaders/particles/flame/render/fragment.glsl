@@ -11,10 +11,10 @@ uniform sampler2D fFlameStart;
 uniform sampler2D fFlameSpark;
 
 void main() {
-    if (fLifetime / fLifespan < 0.6f) {
+    if (fLifetime / fLifespan < 0.4f) {
         color = texture(fFlameStart, fTexCoord);
     } else {
-        color = texture(fFlameStart, fTexCoord);
+        color = texture(fFlameSpark, fTexCoord);
     }
     if (all(lessThan(color.rgb, vec3(0.1f))) || color.a < 0.2f) {
         discard;

@@ -16,20 +16,20 @@ private:
     int cur = 0;
     int num_launchers{};
     shared_ptr<TextureRandom> texture_rd;
-    std::string texture;
+    vector<std::string> textures;
 
     void UpdateParticles(shared_ptr<Shader>& shader);
     void RenderParticles(shared_ptr<Shader>& shader);
 
 public:
-    ParticleSystem(glm::vec3 position, const std::string& texture);
+    ParticleSystem(glm::vec3 position, const vector<std::string>& textures);
     ~ParticleSystem();
     void Render(shared_ptr<Shader>& shader_update, shared_ptr<Shader>& shader_render);
 };
 
-template<typename T> ParticleSystem<T>::ParticleSystem(glm::vec3 position, const std::string& texture) {
+template<typename T> ParticleSystem<T>::ParticleSystem(glm::vec3 position, const vector<std::string>& textures) {
     this->texture_rd = std::make_shared<TextureRandom>(1000);
-    this->texture = texture;
+    this->textures = textures;
 
     vector<T> particles = T::GetLaunchers(position);
     this->num_launchers = particles.size();
@@ -84,7 +84,9 @@ template<typename T> void ParticleSystem<T>::UpdateParticles(shared_ptr<Shader>&
 
 template<typename T> void ParticleSystem<T>::RenderParticles(shared_ptr<Shader>& shader) {
     shader->Use();
-    ResourceManager::BindTexture(this->texture, 0);
+    for(int i = 0; i < this->textures.size(); ++i) {
+        ResourceManager::BindTexture(this->textures[i], i);
+    }
 
     glDisable(GL_RASTERIZER_DISCARD);
 

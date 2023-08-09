@@ -50,11 +50,11 @@ void Cylinder::LoadData() {
                 glm::vec2(cos(theta) / 2 + 0.5f, sin(theta) / 2 + 0.5f),
                 glm::vec3(0.0f, -1.0f, 0.0f)
         );
-        cycle_vertices[1].insert(cycle_vertices[1].end(), {
+        cycle_vertices[1].emplace_back(
                 glm::vec3(cos(theta), 1.0f, sin(theta)),
                 glm::vec2(cos(theta) / 2 + 0.5f, sin(theta) / 2 + 0.5f),
                 glm::vec3(0.0f, 1.0f, 0.0f)
-        });
+        );
         if (j == cols) continue;
         cycle_indices[0].insert(cycle_indices[0].end(), {
                 (GLuint)j,

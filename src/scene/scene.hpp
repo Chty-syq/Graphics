@@ -31,8 +31,8 @@ void GraphScene::LoadScene() {
     skybox = std::make_shared<GameObject>(std::make_shared<Cube>("skybox"), glm::vec3(0.0f));
     board = std::make_shared<Billboard>("brickwall");
 
-    fireworks = std::make_shared<ParticleSystem<Fireworks>>(glm::vec3(15.0f, 0.1f, 15.0f), "star_02");
-    flame = std::make_shared<ParticleSystem<Flame>>(SceneStatus::flame_center, "flame");
+    fireworks = std::make_shared<ParticleSystem<Fireworks>>(glm::vec3(15.0f, 0.1f, 15.0f), vector<std::string>{"star_02"});
+    flame = std::make_shared<ParticleSystem<Flame>>(SceneStatus::flame_center, vector<std::string>{"flame_start", "flame_spark"});
 
     auto cube = std::make_shared<GameObject>(
             std::make_shared<Cone>("brickwall"),
