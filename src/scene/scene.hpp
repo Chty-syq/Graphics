@@ -91,6 +91,8 @@ void GraphScene::RenderBillBoard(shared_ptr<Shader>& shader) {
 }
 
 void GraphScene::RenderParticleSystem() {
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE);
     fireworks->Render(
             ResourceManager::shader_fireworks_update,
             ResourceManager::shader_fireworks_render,
@@ -103,4 +105,5 @@ void GraphScene::RenderParticleSystem() {
             SceneStatus::flame_center,
             glm::vec3(0.0f)
             );
+    glDisable(GL_BLEND);
 }
