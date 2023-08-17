@@ -7,7 +7,7 @@
 namespace SceneStatus {
     bool blinn = false;
 
-    float previous_time = 0.0f;
+    float previous_time = -1.0f;
     float current_time = 0.0f;
     int fps = 0;
 
@@ -24,4 +24,8 @@ namespace SceneStatus {
     float fountain_theta = glm::radians(120.0f);
     float fountain_lifetime_max = 1.0f;
     float fountain_lifetime_min = 0.3f;
+
+    float GetDuration() {
+        return previous_time < 0.0f ? 0.0f : current_time - previous_time;
+    }
 }

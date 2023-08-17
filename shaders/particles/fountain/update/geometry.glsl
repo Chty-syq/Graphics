@@ -38,7 +38,7 @@ vec3 GetRandomFloats(float texCoord) {  //random number from [0, 1]
 
 void UpdateLauncher() {
     if (age <= 0) { //发射shell并重置launcher
-        vec3 random = GetRandomFloats(gLifetime[0]);
+        vec3 random = GetRandomFloats(gLifetime[0] * 1000);
         float theta = random.x * (gTheta / 2);
         float phi = random.y * (2 * PI);
         float dist = length(gPosition[0]);

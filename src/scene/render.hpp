@@ -82,7 +82,7 @@ void GraphRender::Init() {
 }
 
 void GraphRender::KeyboardInput() {
-    float duration = SceneStatus::current_time - SceneStatus::previous_time;
+    float duration = SceneStatus::GetDuration();
     if (keydown(GLFW_KEY_W))  camera->KeyboardInput(Direction::forward, duration);
     if (keydown(GLFW_KEY_S))  camera->KeyboardInput(Direction::backward, duration);
     if (keydown(GLFW_KEY_A))  camera->KeyboardInput(Direction::left, duration);
@@ -125,7 +125,7 @@ void GraphRender::MouseScrollCallback(GLFWwindow* window_, double offset_x, doub
 
 void GraphRender::UpdateStateBegin() {
     SceneStatus::current_time = (float)glfwGetTime();
-    float duration = SceneStatus::current_time - SceneStatus::previous_time;
+    float duration = SceneStatus::GetDuration();
 
     static float timer = 0.0f;
     static int frames = 0;
@@ -161,7 +161,7 @@ void GraphRender::SetShaderProperties() {
     ResourceManager::shader_billboard->SetAttribute("projection", projection);
     ResourceManager::shader_billboard->SetAttribute("cameraPos", camera->GetPosition());
 
-    float duration = SceneStatus::current_time - SceneStatus::previous_time;
+    float duration = SceneStatus::GetDuration();
     ResourceManager::shader_fireworks_update->Use();
     ResourceManager::shader_fireworks_update->SetAttribute("gTime", SceneStatus::current_time);
     ResourceManager::shader_fireworks_update->SetAttribute("gDeltaTime", duration);
