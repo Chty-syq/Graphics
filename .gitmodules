@@ -10,3 +10,6 @@
 [submodule "third-party/imgui"]
 	path = third-party/imgui
 	url = https://github.com/ocornut/imgui.git
+[submodule "third-party/poisson_disk_sampling"]
+	path = third-party/poisson_disk_sampling
+	url = https://github.com/thinks/poisson-disk-sampling.git

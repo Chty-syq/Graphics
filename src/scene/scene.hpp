@@ -21,6 +21,7 @@ namespace GraphScene {
     shared_ptr<Billboard> board;
     shared_ptr<ParticleSystem<Fireworks>> fireworks;
     shared_ptr<ParticleSystem<Flame>> flame;
+    shared_ptr<ParticleSystem<Fountain>> fountain;
 
     void LoadScene();
     void RenderSkybox(shared_ptr<Shader>& shader);
@@ -35,6 +36,7 @@ void GraphScene::LoadScene() {
 
     fireworks = std::make_shared<ParticleSystem<Fireworks>>(vector<std::string>{"star_02"});
     flame = std::make_shared<ParticleSystem<Flame>>(vector<std::string>{"flame_start", "flame_spark"});
+    fountain = std::make_shared<ParticleSystem<Fountain>>(vector<std::string>{"circle_05"});
 
     auto cube = std::make_shared<GameObject<BaseSprite>>(
             std::make_shared<Cone>("brickwall"),
@@ -103,6 +105,12 @@ void GraphScene::RenderParticleSystem() {
             ResourceManager::shader_flame_update,
             ResourceManager::shader_flame_render,
             SceneStatus::flame_center,
+            glm::vec3(0.0f)
+            );
+    fountain->Render(
+            ResourceManager::shader_fountain_update,
+            ResourceManager::shader_fountain_render,
+            glm::vec3(-3.0f, 0.0f, -10.0f),
             glm::vec3(0.0f)
             );
     glDisable(GL_BLEND);

@@ -179,6 +179,15 @@ void GraphRender::SetShaderProperties() {
     ResourceManager::shader_flame_render->SetAttribute("view", view);
     ResourceManager::shader_flame_render->SetAttribute("projection", projection);
     ResourceManager::shader_flame_render->SetAttribute("cameraPos", camera->GetPosition());
+
+    ResourceManager::shader_fountain_update->Use();
+    ResourceManager::shader_fountain_update->SetAttribute("gTime", SceneStatus::current_time);
+    ResourceManager::shader_fountain_update->SetAttribute("gDeltaTime", duration);
+
+    ResourceManager::shader_fountain_render->Use();
+    ResourceManager::shader_fountain_render->SetAttribute("view", view);
+    ResourceManager::shader_fountain_render->SetAttribute("projection", projection);
+    ResourceManager::shader_fountain_render->SetAttribute("cameraPos", camera->GetPosition());
 }
 
 void GraphRender::Display() {

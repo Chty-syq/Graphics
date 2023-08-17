@@ -6,6 +6,7 @@
 #include "framework/texture_random.hpp"
 #include "framework/particle_system/particles/fireworks.hpp"
 #include "framework/particle_system/particles/flame.hpp"
+#include "framework/particle_system/particles/fountain.hpp"
 
 template<typename T> class ParticleSystem {
 private:

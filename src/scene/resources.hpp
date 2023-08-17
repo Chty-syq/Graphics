@@ -22,6 +22,8 @@ namespace ResourceManager {
     shared_ptr<Shader> shader_fireworks_render;
     shared_ptr<Shader> shader_flame_update;
     shared_ptr<Shader> shader_flame_render;
+    shared_ptr<Shader> shader_fountain_update;
+    shared_ptr<Shader> shader_fountain_render;
 
     LightParal light_paral;
     vector<LightPoint> light_points;
@@ -195,4 +197,19 @@ void ResourceManager::LoadShaderObject() {
     shader_flame_render->Use();
     shader_flame_render->SetAttribute("fFlameStart", 0);
     shader_flame_render->SetAttribute("fFlameSpark", 1);
+
+    shader_fountain_update = std::make_shared<Shader>(fs::current_path().parent_path() / "shaders" / "particles" / "fountain" / "update");
+    shader_fountain_update->Use();
+    shader_fountain_update->SetTFOVarying({"fPosition", "fVelocity", "fType", "fLifetime"});
+    shader_fountain_update->SetAttribute("gRadius", SceneStatus::fountain_radius);
+    shader_fountain_update->SetAttribute("gTheta", SceneStatus::fountain_theta);
+    shader_fountain_update->SetAttribute("gNormal", glm::vec3(0.0f, 1.0f, 0.0f));
+    shader_fountain_update->SetAttribute("gLifespanMax", SceneStatus::fountain_lifetime_max);
+    shader_fountain_update->SetAttribute("gLifespanMin", SceneStatus::fountain_lifetime_min);
+    shader_fountain_update->SetAttribute("gRandomMap", 0);
+
+    shader_fountain_render = std::make_shared<Shader>(fs::current_path().parent_path() / "shaders" / "particles" / "fountain" / "render");
+    shader_fountain_render->Use();
+    shader_fountain_render->SetAttribute("fTexture", 0);
+    shader_fountain_render->SetAttribute("size", 0.3f);
 }
