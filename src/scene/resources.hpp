@@ -138,7 +138,7 @@ void ResourceManager::LoadShaderObject() {
     auto projection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, 1.0f, 7.5f);
     auto view = glm::lookAt(light_paral.direction * (-4.0f), glm::vec3(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 
-    shader_object = std::make_shared<Shader>(fs::current_path().parent_path() / "shaders" / "normal");
+    shader_object = std::make_shared<Shader>(fs::current_path().parent_path() / "shaders" / "object");
     shader_object->Use();
     shader_object->SetAttribute("mLightSpace", projection * view);
     shader_object->SetAttribute("fShadowMap", 2);
