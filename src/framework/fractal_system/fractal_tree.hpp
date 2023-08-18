@@ -20,7 +20,7 @@ private:
 
     std::string generation;
     Status status{};
-    vector<GameObject<Cylinder>> trunks;
+    shared_ptr<BaseSprite> trunks;
 
     const float delta_x = 35.0f;
     const float delta_y = 30.0f;
@@ -31,7 +31,7 @@ private:
 public:
     FractalTree(const std::string& texture, int level);
     void Generate();
-    void Render(shared_ptr<Shader>& shader);
+    void Render(shared_ptr<Shader>& shader, glm::vec3 position, glm::quat rotate, glm::vec3 size);
 };
 
 FractalTree::FractalTree(const std::string& texture, int level) {
@@ -45,6 +45,7 @@ FractalTree::FractalTree(const std::string& texture, int level) {
 
     this->texture = texture;
     this->level = level;
+    this->trunks = std::make_shared<Cylinder>(texture);
     this->Generate();
 }
 
@@ -56,18 +57,19 @@ void FractalTree::Generate() {
             .radius = 0.05f,
             .level = 1
     };
-
     std::stack<Status> status_stack;
     for(const auto& target : generation) {
         switch (target) {
             case 'F': {
-                glm::vec3 axis = glm::cross(status.direction, glm::vec3(0.0f, 1.0f, 0.0f));
-                trunks.emplace_back(
-                        std::make_shared<Cylinder>(texture),
+                auto trunk = std::make_shared<Cylinder>();
+                trunk->LoadData();
+                trunk->ApplyTransform(
                         status.position,
                         transformation::RotateVec(glm::vec3(0.0f, 1.0f, 0.0f), status.direction),
                         glm::vec3(status.radius, status.length, status.radius)
                         );
+                trunk->LoadBuffer();
+                trunks->Combine(trunk);
                 status.position += status.direction * status.length;
                 break;
             }
@@ -92,11 +94,10 @@ void FractalTree::Generate() {
             default: break;
         }
     }
+    this->trunks->LoadBuffer();
 }
 
-void FractalTree::Render(shared_ptr<Shader>& shader) {
-    for(auto & trunk : trunks) {
-        trunk.Draw(shader);
-    }
+void FractalTree::Render(shared_ptr<Shader>& shader, glm::vec3 position, glm::quat rotate, glm::vec3 size) {
+    trunks->Render(shader, position, rotate, size);
 }
 

@@ -16,8 +16,6 @@ protected:
     GLuint vao{}, vbo{}, ebo{};
     std::string diffuse_map = "empty";
     std::string specular_map = "empty";
-    void Combine(const BaseSprite& other);
-    void Combine(const VertexArr& o_vertices, const IndiceArr& o_indices);
 public:
     BaseSprite() = default;
     explicit BaseSprite(const std::string &diffuse_map);
@@ -25,8 +23,11 @@ public:
     ~BaseSprite();
     virtual void LoadData() = 0;
     void LoadBuffer();
+    void ApplyTransform(glm::vec3 position, glm::quat rotate, glm::vec3 size);
+    void Combine(const shared_ptr<BaseSprite>& other);
+    void Combine(const VertexArr& o_vertices, const IndiceArr& o_indices);
     void Render() const;  //渲染
-    void Draw(shared_ptr<Shader>& shader, glm::vec3 position, glm::quat rotate, glm::vec3 size);
+    void Render(shared_ptr<Shader>& shader, glm::vec3 position, glm::quat rotate, glm::vec3 size);
 };
 
 BaseSprite::BaseSprite(const std::string &diffuse_map) {
@@ -44,8 +45,8 @@ BaseSprite::~BaseSprite() {
     glDeleteBuffers(1, &this->ebo);
 }
 
-void BaseSprite::Combine(const BaseSprite &other) {
-    this->Combine(other.vertices, other.indices);
+void BaseSprite::Combine(const shared_ptr<BaseSprite>& other) {
+    this->Combine(other->vertices, other->indices);
 }
 
 void BaseSprite::Combine(const VertexArr &o_vertices, const IndiceArr& o_indices) {
@@ -78,6 +79,18 @@ void BaseSprite::LoadBuffer() {
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
+void BaseSprite::ApplyTransform(glm::vec3 position, glm::quat rotate, glm::vec3 size) {
+    auto m_translate = glm::translate(glm::mat4(1.0f), position);
+    auto m_rotate = glm::mat4_cast(rotate);
+    auto m_scale = glm::scale(glm::mat4(1.0f), size);
+    auto model = m_translate * m_rotate * m_scale;
+
+    for(auto & vertex : vertices) {
+        vertex.position = glm::vec3(model * glm::vec4(vertex.position, 1.0f));
+        vertex.normal = glm::mat3(glm::transpose(glm::inverse(model))) * vertex.normal;
+    }
+}
+
 void BaseSprite::Render() const {
     glBindVertexArray(this->vao);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->ebo);
@@ -85,7 +98,7 @@ void BaseSprite::Render() const {
     glBindVertexArray(0);
 }
 
-void BaseSprite::Draw(shared_ptr<Shader>& shader, glm::vec3 position, glm::quat rotate, glm::vec3 size) {
+void BaseSprite::Render(shared_ptr<Shader>& shader, glm::vec3 position, glm::quat rotate, glm::vec3 size) {
     auto m_translate = glm::translate(glm::mat4(1.0f), position);
     auto m_rotate = glm::mat4_cast(rotate);
     auto m_scale = glm::scale(glm::mat4(1.0f), size);

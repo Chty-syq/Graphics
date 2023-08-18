@@ -21,10 +21,10 @@ namespace GraphScene {
 
     shared_ptr<GameObject<BaseSprite>> skybox;
     shared_ptr<Billboard> board;
-    shared_ptr<ParticleSystem<Fireworks>> fireworks;
-    shared_ptr<ParticleSystem<Flame>> flame;
-    shared_ptr<ParticleSystem<Fountain>> fountain;
-    shared_ptr<FractalTree> tree;
+    shared_ptr<GameObject<ParticleSystem<Fireworks>>> fireworks;
+    shared_ptr<GameObject<ParticleSystem<Flame>>> flame;
+    shared_ptr<GameObject<ParticleSystem<Fountain>>> fountain;
+    shared_ptr<GameObject<FractalTree>> tree;
 
     void LoadScene();
     void RenderSkybox(shared_ptr<Shader>& shader);
@@ -37,10 +37,28 @@ void GraphScene::LoadScene() {
     skybox = std::make_shared<GameObject<BaseSprite>>(std::make_shared<Cube>("skybox"), glm::vec3(0.0f));
     board = std::make_shared<Billboard>("brickwall");
 
-    fireworks = std::make_shared<ParticleSystem<Fireworks>>(vector<std::string>{"star_02"});
-    flame = std::make_shared<ParticleSystem<Flame>>(vector<std::string>{"flame_start", "flame_spark"});
-    fountain = std::make_shared<ParticleSystem<Fountain>>(vector<std::string>{"circle_05"});
-    tree = std::make_shared<FractalTree>("brickwall", 4);
+    fireworks = std::make_shared<GameObject<ParticleSystem<Fireworks>>>(
+            std::make_shared<ParticleSystem<Fireworks>>(vector<std::string>{"star_02"}),
+            glm::vec3(15.0f, 0.1f, 15.0f),
+            glm::quat(1.0f, 0.0f, 0.0f, 0.0f),
+            glm::vec3(1.0f)
+            );
+    flame = std::make_shared<GameObject<ParticleSystem<Flame>>>(
+            std::make_shared<ParticleSystem<Flame>>(vector<std::string>{"flame_start", "flame_spark"}),
+            SceneStatus::flame_center,
+            glm::quat(1.0f, 0.0f, 0.0f, 0.0f),
+            glm::vec3(1.0f)
+            );
+    fountain = std::make_shared<GameObject<ParticleSystem<Fountain>>>(
+            std::make_shared<ParticleSystem<Fountain>>(vector<std::string>{"circle_05"}),
+            glm::vec3(-3.0f, 0.0f, -10.0f),
+            glm::quat(1.0f, 0.0f, 0.0f, 0.0f),
+            glm::vec3(0.3f)
+            );
+    tree = std::make_shared<GameObject<FractalTree>>(
+            std::make_shared<FractalTree>("brickwall", 5),
+            glm::vec3(3.0f, 0.0f, -3.0f)
+            );
 
     auto cube = std::make_shared<GameObject<BaseSprite>>(
             std::make_shared<Cone>("brickwall"),
@@ -82,16 +100,16 @@ void GraphScene::LoadScene() {
 
 void GraphScene::RenderSkybox(shared_ptr<Shader>& shader) {
     glDepthFunc(GL_LEQUAL);
-    skybox->Draw(shader);
+    skybox->Render(shader);
     glDepthFunc(GL_LESS);
 }
 
 void GraphScene::RenderObjects(shared_ptr<Shader>& shader) {
     for(auto & sprite : sprites) {
-        sprite->Draw(shader);
+        sprite->Render(shader);
     }
     for(auto &model : models) {
-        model->Draw(shader);
+        model->Render(shader);
     }
     tree->Render(shader);
 }
@@ -103,26 +121,8 @@ void GraphScene::RenderBillBoard(shared_ptr<Shader>& shader) {
 void GraphScene::RenderParticleSystem() {
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE);
-    fireworks->Render(
-            ResourceManager::shader_fireworks_update,
-            ResourceManager::shader_fireworks_render,
-            glm::vec3(15.0f, 0.1f, 15.0f),
-            glm::vec3(1.0f),
-            glm::vec3(0.0f)
-            );
-    flame->Render(
-            ResourceManager::shader_flame_update,
-            ResourceManager::shader_flame_render,
-            SceneStatus::flame_center,
-            glm::vec3(1.0f),
-            glm::vec3(0.0f)
-            );
-    fountain->Render(
-            ResourceManager::shader_fountain_update,
-            ResourceManager::shader_fountain_render,
-            glm::vec3(-3.0f, 0.0f, -10.0f),
-            glm::vec3(0.3f),
-            glm::vec3(0.0f)
-            );
+    fireworks->Render(ResourceManager::shader_fireworks_update, ResourceManager::shader_fireworks_render);
+    flame->Render(ResourceManager::shader_flame_update, ResourceManager::shader_flame_render);
+    fountain->Render(ResourceManager::shader_fountain_update, ResourceManager::shader_fountain_render);
     glDisable(GL_BLEND);
 }
