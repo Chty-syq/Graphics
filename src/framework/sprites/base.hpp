@@ -26,12 +26,7 @@ public:
     virtual void LoadData() = 0;
     void LoadBuffer();
     void Render() const;  //渲染
-    void Draw(
-        shared_ptr<Shader>& shader,
-        glm::vec3 position,
-        glm::vec3 size = glm::vec3(1.0f, 1.0f, 1.0f),
-        glm::vec3 rotate = glm::vec3(0.0f, 0.0f, 0.0f)
-    );
+    void Draw(shared_ptr<Shader>& shader, glm::vec3 position, glm::quat rotate, glm::vec3 size);
 };
 
 BaseSprite::BaseSprite(const std::string &diffuse_map) {
@@ -90,16 +85,13 @@ void BaseSprite::Render() const {
     glBindVertexArray(0);
 }
 
-void BaseSprite::Draw(shared_ptr<Shader>& shader, glm::vec3 position, glm::vec3 size, glm::vec3 rotate) {
-    auto model = glm::mat4(1.0f);
-    model = glm::translate(model, position);
-    model = glm::rotate(model, rotate[0], glm::vec3(1.0f, 0.0f, 0.0f));
-    model = glm::rotate(model, rotate[1], glm::vec3(0.0f, 1.0f, 0.0f));
-    model = glm::rotate(model, rotate[2], glm::vec3(0.0f, 0.0f, 1.0f));
-    model = glm::scale(model, size);
+void BaseSprite::Draw(shared_ptr<Shader>& shader, glm::vec3 position, glm::quat rotate, glm::vec3 size) {
+    auto m_translate = glm::translate(glm::mat4(1.0f), position);
+    auto m_rotate = glm::mat4_cast(rotate);
+    auto m_scale = glm::scale(glm::mat4(1.0f), size);
 
     shader->Use();
-    shader->SetAttribute("model", model);
+    shader->SetAttribute("model", m_translate * m_rotate * m_scale);
 
     ResourceManager::BindTexture(this->diffuse_map, 0);
     ResourceManager::BindTexture(this->specular_map, 1);

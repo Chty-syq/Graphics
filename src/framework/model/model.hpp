@@ -26,12 +26,7 @@ private:
 public:
     explicit Model(const std::string &path);
     ~Model() = default;
-    void Draw(
-        shared_ptr<Shader>& shader,
-        glm::vec3 position,
-        glm::vec3 size = glm::vec3(1.0f, 1.0f, 1.0f),
-        glm::vec3 rotate = glm::vec3(0.0f, 0.0f, 0.0f)
-    );
+    void Draw(shared_ptr<Shader>& shader, glm::vec3 position, glm::quat rotate, glm::vec3 size);
 };
 
 Model::Model(const std::string &path) {
@@ -103,8 +98,8 @@ std::string Model::ProcessTexture(aiMaterial* material, aiTextureType type) {
     return "empty";
 }
 
-void Model::Draw(shared_ptr<Shader>& shader, glm::vec3 position, glm::vec3 size, glm::vec3 rotate) {
+void Model::Draw(shared_ptr<Shader>& shader, glm::vec3 position, glm::quat rotate, glm::vec3 size) {
     for(auto &mesh : this->meshes) {
-        mesh.Draw(shader, position, size, rotate);
+        mesh.Draw(shader, position, rotate, size);
     }
 }

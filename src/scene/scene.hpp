@@ -12,6 +12,8 @@
 #include "framework/sprites/base.hpp"
 #include "framework/model/model.hpp"
 #include "framework/particle_system/base.hpp"
+#include "framework/fractal_system/grammar.hpp"
+#include "framework/fractal_system/fractal_tree.hpp"
 
 namespace GraphScene {
     vector<shared_ptr<GameObject<BaseSprite>>> sprites;
@@ -22,6 +24,7 @@ namespace GraphScene {
     shared_ptr<ParticleSystem<Fireworks>> fireworks;
     shared_ptr<ParticleSystem<Flame>> flame;
     shared_ptr<ParticleSystem<Fountain>> fountain;
+    shared_ptr<FractalTree> tree;
 
     void LoadScene();
     void RenderSkybox(shared_ptr<Shader>& shader);
@@ -37,12 +40,13 @@ void GraphScene::LoadScene() {
     fireworks = std::make_shared<ParticleSystem<Fireworks>>(vector<std::string>{"star_02"});
     flame = std::make_shared<ParticleSystem<Flame>>(vector<std::string>{"flame_start", "flame_spark"});
     fountain = std::make_shared<ParticleSystem<Fountain>>(vector<std::string>{"circle_05"});
+    tree = std::make_shared<FractalTree>("brickwall", 4);
 
     auto cube = std::make_shared<GameObject<BaseSprite>>(
             std::make_shared<Cone>("brickwall"),
             glm::vec3(3.0f, 1.0f, 3.0f),
-            glm::vec3(1.0f),
-            glm::vec3(glm::radians(90.0f))
+            glm::angleAxis(glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f)),
+            glm::vec3(1.0f)
             );
 
     auto floor = std::make_shared<GameObject<BaseSprite>>(
@@ -52,17 +56,20 @@ void GraphScene::LoadScene() {
     auto nanosuit = std::make_shared<GameObject<Model>>(
             std::make_shared<Model>(fs::current_path().parent_path() / "assets" / "meshes" / "nanosuit" / "nanosuit.obj"),
             glm::vec3(0.0f, 0.0f, 3.0f),
+            glm::quat(1.0f, 0.0f, 0.0f, 0.0f),
             glm::vec3(0.2f)
             );
     auto klee = std::make_shared<GameObject<Model>>(
             std::make_shared<Model>(fs::current_path().parent_path() / "assets" / "meshes" / "Klee" / "Klee.pmx"),
             glm::vec3(3.0f, 0.0f, 0.0f),
+            glm::quat(1.0f, 0.0f, 0.0f, 0.0f),
             glm::vec3(0.2f)
             );
     for(auto & light_point : ResourceManager::light_points) {
         auto sphere = std::make_shared<GameObject<BaseSprite>>(
                 std::make_shared<Sphere>("container", "container_spec"),
                 light_point.position,
+                glm::quat(1.0f, 0.0f, 0.0f, 0.0f),
                 glm::vec3(0.3f)
         );
         sprites.push_back(sphere);
@@ -86,6 +93,7 @@ void GraphScene::RenderObjects(shared_ptr<Shader>& shader) {
     for(auto &model : models) {
         model->Draw(shader);
     }
+    tree->Render(shader);
 }
 
 void GraphScene::RenderBillBoard(shared_ptr<Shader>& shader) {
@@ -99,18 +107,21 @@ void GraphScene::RenderParticleSystem() {
             ResourceManager::shader_fireworks_update,
             ResourceManager::shader_fireworks_render,
             glm::vec3(15.0f, 0.1f, 15.0f),
+            glm::vec3(1.0f),
             glm::vec3(0.0f)
             );
     flame->Render(
             ResourceManager::shader_flame_update,
             ResourceManager::shader_flame_render,
             SceneStatus::flame_center,
+            glm::vec3(1.0f),
             glm::vec3(0.0f)
             );
     fountain->Render(
             ResourceManager::shader_fountain_update,
             ResourceManager::shader_fountain_render,
             glm::vec3(-3.0f, 0.0f, -10.0f),
+            glm::vec3(0.3f),
             glm::vec3(0.0f)
             );
     glDisable(GL_BLEND);

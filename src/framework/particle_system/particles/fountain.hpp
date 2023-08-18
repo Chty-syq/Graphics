@@ -18,7 +18,6 @@ struct Fountain {
 
 vector<Fountain> Fountain::GetLaunchers() {
     vector<Fountain> launchers;
-    std::normal_distribution<float> dist(0, SceneStatus::flame_radius);
     for(int i = 0; i < 1500; ++i) {
         float theta = utils::RandomFloat(0, 2 * PI);
         float r = sqrt(utils::RandomFloat(0, pow(SceneStatus::fountain_radius, 2.0f)));

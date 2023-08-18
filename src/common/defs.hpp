@@ -8,6 +8,7 @@
 #include <memory>
 #include <iostream>
 #include <vector>
+#include <map>
 #include <stb_image.h>
 #include "common/structs.hpp"
 
@@ -17,6 +18,7 @@ using std::cin;
 using std::cout;
 using std::endl;
 using std::vector;
+using std::pair;
 using std::unique_ptr;
 using std::shared_ptr;
 

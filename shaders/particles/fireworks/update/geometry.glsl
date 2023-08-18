@@ -46,7 +46,7 @@ void UpdateLauncher() {
     if (age >= gLifetimeLauncher) { //发射shell并重置launcher
         for(int i = 0; i < 5; ++i) {
             vec3 direction = GetRandomDirection(gTime);
-            direction.y = max(direction.y, 0.5);
+            direction.y = max(direction.y, 1.0);
 
             fPosition = gPosition[0];
             fVelocity = normalize(direction) * speed;
