@@ -30,7 +30,13 @@ void GUI::Render() {
     ImGui::NewFrame();
 
     ImGui::Begin("Console");
-    ImGui::Checkbox("Blinn-Phong", &SceneStatus::blinn);
+    if (ImGui::CollapsingHeader("Lighting")) {
+        ImGui::Checkbox("Blinn-Phong", &SceneStatus::blinn);
+    }
+    if (ImGui::CollapsingHeader("Flame")) {
+        ImGui::SliderFloat("LifetimeMax", &SceneStatus::flame_lifetime_max, 0.0f, 10.0f);
+        ImGui::SliderFloat("LifetimeMin", &SceneStatus::flame_lifetime_min, 0.0f, 10.0f);
+    }
 
     ImGui::End();
     ImGui::Render();

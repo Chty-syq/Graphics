@@ -39,7 +39,8 @@ namespace ResourceManager {
     shared_ptr<Texture2D> GetTexture(const std::string &name);
 
     void LoadLights();
-    void LoadShaderObject();
+    void LoadShaders();
+    void SetShaderProperties(const shared_ptr<Camera> &camera);
 };
 
 void ResourceManager::Init() {
@@ -48,7 +49,7 @@ void ResourceManager::Init() {
     LoadTextures(fs::current_path().parent_path() / "assets" / "particles");
     LoadTextureCube(fs::current_path().parent_path() / "assets" / "textures_cube" / "skybox");
     LoadLights();
-    LoadShaderObject();
+    LoadShaders();
 }
 
 void ResourceManager::LoadTexture(const std::string &path) {
@@ -134,7 +135,7 @@ void ResourceManager::LoadLights() {
     };
 }
 
-void ResourceManager::LoadShaderObject() {
+void ResourceManager::LoadShaders() {
     auto projection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, 1.0f, 7.5f);
     auto view = glm::lookAt(light_paral.direction * (-4.0f), glm::vec3(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 
@@ -185,12 +186,6 @@ void ResourceManager::LoadShaderObject() {
     shader_flame_update = std::make_shared<Shader>(fs::current_path().parent_path() / "shaders" / "particles" / "flame" / "update");
     shader_flame_update->Use();
     shader_flame_update->SetTFOVarying({"fPosition", "fVelocity", "fAlpha", "fType", "fSize", "fLifetime", "fLifespan"});
-    shader_flame_update->SetAttribute("gRadius", SceneStatus::flame_radius);
-    shader_flame_update->SetAttribute("gCenter", SceneStatus::flame_center);
-    shader_flame_update->SetAttribute("gLifespanMax", SceneStatus::flame_lifetime_max);
-    shader_flame_update->SetAttribute("gLifespanMin", SceneStatus::flame_lifetime_min);
-    shader_flame_update->SetAttribute("gVelocityMax", SceneStatus::flame_velocity_max);
-    shader_flame_update->SetAttribute("gVelocityMin", SceneStatus::flame_velocity_min);
     shader_flame_update->SetAttribute("gRandomMap", 0);
 
     shader_flame_render = std::make_shared<Shader>(fs::current_path().parent_path() / "shaders" / "particles" / "flame" / "render");
@@ -212,4 +207,57 @@ void ResourceManager::LoadShaderObject() {
     shader_fountain_render->Use();
     shader_fountain_render->SetAttribute("fTexture", 0);
     shader_fountain_render->SetAttribute("size", 0.3f);
+}
+
+void ResourceManager::SetShaderProperties(const shared_ptr<Camera> &camera) {
+    auto view = camera->GetViewMat();
+    auto projection = glm::perspective(glm::radians(camera->GetZoom()), (GLfloat)SCREEN_WIDTH / (GLfloat)SCREEN_HEIGHT, 0.1f, 100.0f);
+    shader_object->Use();
+    shader_object->SetAttribute("view", view);
+    shader_object->SetAttribute("projection", projection);
+    shader_object->SetAttribute("fLightSpot.sDirection", camera->GetFront());
+    shader_object->SetAttribute("fLightSpot.sLightPoint.pPosition", camera->GetPosition());
+    shader_object->SetAttribute("blinn", SceneStatus::blinn);
+
+    ResourceManager::shader_skybox->Use();
+    ResourceManager::shader_skybox->SetAttribute("view", glm::mat4(glm::mat3(view)));
+    ResourceManager::shader_skybox->SetAttribute("projection", projection);
+
+    ResourceManager::shader_billboard->Use();
+    ResourceManager::shader_billboard->SetAttribute("view", view);
+    ResourceManager::shader_billboard->SetAttribute("projection", projection);
+    ResourceManager::shader_billboard->SetAttribute("cameraPos", camera->GetPosition());
+
+    float duration = SceneStatus::GetDuration();
+    ResourceManager::shader_fireworks_update->Use();
+    ResourceManager::shader_fireworks_update->SetAttribute("gTime", SceneStatus::current_time);
+    ResourceManager::shader_fireworks_update->SetAttribute("gDeltaTime", duration);
+
+    ResourceManager::shader_fireworks_render->Use();
+    ResourceManager::shader_fireworks_render->SetAttribute("view", view);
+    ResourceManager::shader_fireworks_render->SetAttribute("projection", projection);
+    ResourceManager::shader_fireworks_render->SetAttribute("cameraPos", camera->GetPosition());
+
+    shader_flame_update->Use();
+    shader_flame_update->SetAttribute("gTime", SceneStatus::current_time);
+    shader_flame_update->SetAttribute("gDeltaTime", duration);
+    shader_flame_update->SetAttribute("gRadius", SceneStatus::flame_radius);
+    shader_flame_update->SetAttribute("gLifespanMax", SceneStatus::flame_lifetime_max);
+    shader_flame_update->SetAttribute("gLifespanMin", SceneStatus::flame_lifetime_min);
+    shader_flame_update->SetAttribute("gVelocityMax", SceneStatus::flame_velocity_max);
+    shader_flame_update->SetAttribute("gVelocityMin", SceneStatus::flame_velocity_min);
+
+    ResourceManager::shader_flame_render->Use();
+    ResourceManager::shader_flame_render->SetAttribute("view", view);
+    ResourceManager::shader_flame_render->SetAttribute("projection", projection);
+    ResourceManager::shader_flame_render->SetAttribute("cameraPos", camera->GetPosition());
+
+    ResourceManager::shader_fountain_update->Use();
+    ResourceManager::shader_fountain_update->SetAttribute("gTime", SceneStatus::current_time);
+    ResourceManager::shader_fountain_update->SetAttribute("gDeltaTime", duration);
+
+    ResourceManager::shader_fountain_render->Use();
+    ResourceManager::shader_fountain_render->SetAttribute("view", view);
+    ResourceManager::shader_fountain_render->SetAttribute("projection", projection);
+    ResourceManager::shader_fountain_render->SetAttribute("cameraPos", camera->GetPosition());
 }

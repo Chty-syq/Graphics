@@ -33,7 +33,7 @@
 
 namespace GraphRender {
     GLFWwindow* window;
-    unique_ptr<Camera> camera = std::make_unique<Camera>(glm::vec3(1.0f, 1.0f, 1.0f));
+    shared_ptr<Camera> camera = std::make_shared<Camera>(glm::vec3(1.0f, 1.0f, 1.0f));
     unique_ptr<FrameBuffer> frame_buffer = std::make_unique<FrameBuffer>();
     unique_ptr<DepthBuffer> depth_buffer = std::make_unique<DepthBuffer>();
 
@@ -41,7 +41,6 @@ namespace GraphRender {
 
     void UpdateStateBegin();
     void UpdateStateEnd();
-    void SetShaderProperties();
     void Display();
     void KeyboardInput();
     void KeyboardCallback(GLFWwindow* window_, int key, int scancode, int action, int mods);
@@ -144,54 +143,6 @@ void GraphRender::UpdateStateEnd() {
     SceneStatus::previous_time = SceneStatus::current_time;
 }
 
-void GraphRender::SetShaderProperties() {
-    auto view = camera->GetViewMat();
-    auto projection = glm::perspective(glm::radians(camera->GetZoom()), (GLfloat)SCREEN_WIDTH / (GLfloat)SCREEN_HEIGHT, 0.1f, 100.0f);
-    ResourceManager::shader_object->Use();
-    ResourceManager::shader_object->SetAttribute("view", view);
-    ResourceManager::shader_object->SetAttribute("projection", projection);
-    ResourceManager::shader_object->SetAttribute("fLightSpot.sDirection", camera->GetFront());
-    ResourceManager::shader_object->SetAttribute("fLightSpot.sLightPoint.pPosition", camera->GetPosition());
-    ResourceManager::shader_object->SetAttribute("blinn", SceneStatus::blinn);
-
-    ResourceManager::shader_skybox->Use();
-    ResourceManager::shader_skybox->SetAttribute("view", glm::mat4(glm::mat3(view)));
-    ResourceManager::shader_skybox->SetAttribute("projection", projection);
-
-    ResourceManager::shader_billboard->Use();
-    ResourceManager::shader_billboard->SetAttribute("view", view);
-    ResourceManager::shader_billboard->SetAttribute("projection", projection);
-    ResourceManager::shader_billboard->SetAttribute("cameraPos", camera->GetPosition());
-
-    float duration = SceneStatus::GetDuration();
-    ResourceManager::shader_fireworks_update->Use();
-    ResourceManager::shader_fireworks_update->SetAttribute("gTime", SceneStatus::current_time);
-    ResourceManager::shader_fireworks_update->SetAttribute("gDeltaTime", duration);
-
-    ResourceManager::shader_fireworks_render->Use();
-    ResourceManager::shader_fireworks_render->SetAttribute("view", view);
-    ResourceManager::shader_fireworks_render->SetAttribute("projection", projection);
-    ResourceManager::shader_fireworks_render->SetAttribute("cameraPos", camera->GetPosition());
-
-    ResourceManager::shader_flame_update->Use();
-    ResourceManager::shader_flame_update->SetAttribute("gTime", SceneStatus::current_time);
-    ResourceManager::shader_flame_update->SetAttribute("gDeltaTime", duration);
-
-    ResourceManager::shader_flame_render->Use();
-    ResourceManager::shader_flame_render->SetAttribute("view", view);
-    ResourceManager::shader_flame_render->SetAttribute("projection", projection);
-    ResourceManager::shader_flame_render->SetAttribute("cameraPos", camera->GetPosition());
-
-    ResourceManager::shader_fountain_update->Use();
-    ResourceManager::shader_fountain_update->SetAttribute("gTime", SceneStatus::current_time);
-    ResourceManager::shader_fountain_update->SetAttribute("gDeltaTime", duration);
-
-    ResourceManager::shader_fountain_render->Use();
-    ResourceManager::shader_fountain_render->SetAttribute("view", view);
-    ResourceManager::shader_fountain_render->SetAttribute("projection", projection);
-    ResourceManager::shader_fountain_render->SetAttribute("cameraPos", camera->GetPosition());
-}
-
 void GraphRender::Display() {
     glEnable(GL_DEPTH_TEST);
     //glEnable(GL_FRAMEBUFFER_SRGB); //gamma校正
@@ -214,7 +165,7 @@ void GraphRender::Display() {
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    SetShaderProperties();
+    ResourceManager::SetShaderProperties(camera);
 
     GraphScene::RenderSkybox(ResourceManager::shader_skybox);
     GraphScene::RenderObjects(ResourceManager::shader_object);

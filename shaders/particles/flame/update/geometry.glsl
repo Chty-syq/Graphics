@@ -27,7 +27,6 @@ uniform float gTime;
 uniform float gRadius;  //火焰半径
 uniform float gLifespanMax;
 uniform float gLifespanMin;
-uniform vec3 gCenter;  //火焰中心
 uniform vec3 gVelocityMax;
 uniform vec3 gVelocityMin;
 

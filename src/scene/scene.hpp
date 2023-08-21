@@ -45,7 +45,7 @@ void GraphScene::LoadScene() {
             );
     flame = std::make_shared<GameObject<ParticleSystem<Flame>>>(
             std::make_shared<ParticleSystem<Flame>>(vector<std::string>{"flame_start", "flame_spark"}),
-            SceneStatus::flame_center,
+            glm::vec3(0.0f),
             glm::quat(1.0f, 0.0f, 0.0f, 0.0f),
             glm::vec3(1.0f)
             );
