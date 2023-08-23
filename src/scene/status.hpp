@@ -11,8 +11,11 @@ namespace SceneStatus {
     float current_time = 0.0f;
     int fps = 0;
 
+    float fireworks_lifetime_launcher = 1.0f;
+    float fireworks_lifetime_shell = 1.0f;
+    float fireworks_lifetime_sec_shell = 2.0f;
+
     //火焰参数
-    float flame_radius = 0.1f;
     float flame_lifetime_max = 2.0f;
     float flame_lifetime_min = 1.0f;
     glm::vec3 flame_velocity_max = glm::vec3(0.0f, 0.5f, 0.0f);

@@ -173,9 +173,6 @@ void ResourceManager::LoadShaders() {
     shader_fireworks_update = std::make_shared<Shader>(fs::current_path().parent_path() / "shaders" / "particles" / "fireworks" / "update");
     shader_fireworks_update->Use();
     shader_fireworks_update->SetTFOVarying({"fPosition", "fVelocity", "fColor", "fType", "fLifetime", "fTag"});
-    shader_fireworks_update->SetAttribute("gLifetimeLauncher", 1.0f);
-    shader_fireworks_update->SetAttribute("gLifetimeShell", 1.0f);
-    shader_fireworks_update->SetAttribute("gLifetimeSecShell", 2.0f);
     shader_fireworks_update->SetAttribute("gRandomMap", 0);
 
     shader_fireworks_render = std::make_shared<Shader>(fs::current_path().parent_path() / "shaders" / "particles" / "fireworks" / "render");
@@ -196,11 +193,7 @@ void ResourceManager::LoadShaders() {
     shader_fountain_update = std::make_shared<Shader>(fs::current_path().parent_path() / "shaders" / "particles" / "fountain" / "update");
     shader_fountain_update->Use();
     shader_fountain_update->SetTFOVarying({"fPosition", "fVelocity", "fType", "fLifetime"});
-    shader_fountain_update->SetAttribute("gRadius", SceneStatus::fountain_radius);
-    shader_fountain_update->SetAttribute("gTheta", SceneStatus::fountain_theta);
     shader_fountain_update->SetAttribute("gNormal", glm::vec3(0.0f, 1.0f, 0.0f));
-    shader_fountain_update->SetAttribute("gLifespanMax", SceneStatus::fountain_lifetime_max);
-    shader_fountain_update->SetAttribute("gLifespanMin", SceneStatus::fountain_lifetime_min);
     shader_fountain_update->SetAttribute("gRandomMap", 0);
 
     shader_fountain_render = std::make_shared<Shader>(fs::current_path().parent_path() / "shaders" / "particles" / "fountain" / "render");
@@ -219,45 +212,51 @@ void ResourceManager::SetShaderProperties(const shared_ptr<Camera> &camera) {
     shader_object->SetAttribute("fLightSpot.sLightPoint.pPosition", camera->GetPosition());
     shader_object->SetAttribute("blinn", SceneStatus::blinn);
 
-    ResourceManager::shader_skybox->Use();
-    ResourceManager::shader_skybox->SetAttribute("view", glm::mat4(glm::mat3(view)));
-    ResourceManager::shader_skybox->SetAttribute("projection", projection);
+    shader_skybox->Use();
+    shader_skybox->SetAttribute("view", glm::mat4(glm::mat3(view)));
+    shader_skybox->SetAttribute("projection", projection);
 
-    ResourceManager::shader_billboard->Use();
-    ResourceManager::shader_billboard->SetAttribute("view", view);
-    ResourceManager::shader_billboard->SetAttribute("projection", projection);
-    ResourceManager::shader_billboard->SetAttribute("cameraPos", camera->GetPosition());
+    shader_billboard->Use();
+    shader_billboard->SetAttribute("view", view);
+    shader_billboard->SetAttribute("projection", projection);
+    shader_billboard->SetAttribute("cameraPos", camera->GetPosition());
 
     float duration = SceneStatus::GetDuration();
-    ResourceManager::shader_fireworks_update->Use();
-    ResourceManager::shader_fireworks_update->SetAttribute("gTime", SceneStatus::current_time);
-    ResourceManager::shader_fireworks_update->SetAttribute("gDeltaTime", duration);
+    shader_fireworks_update->Use();
+    shader_fireworks_update->SetAttribute("gTime", SceneStatus::current_time);
+    shader_fireworks_update->SetAttribute("gDeltaTime", duration);
+    shader_fireworks_update->SetAttribute("gLifetimeLauncher", SceneStatus::fireworks_lifetime_launcher);
+    shader_fireworks_update->SetAttribute("gLifetimeShell", SceneStatus::fireworks_lifetime_shell);
+    shader_fireworks_update->SetAttribute("gLifetimeSecShell", SceneStatus::fireworks_lifetime_sec_shell);
 
-    ResourceManager::shader_fireworks_render->Use();
-    ResourceManager::shader_fireworks_render->SetAttribute("view", view);
-    ResourceManager::shader_fireworks_render->SetAttribute("projection", projection);
-    ResourceManager::shader_fireworks_render->SetAttribute("cameraPos", camera->GetPosition());
+    shader_fireworks_render->Use();
+    shader_fireworks_render->SetAttribute("view", view);
+    shader_fireworks_render->SetAttribute("projection", projection);
+    shader_fireworks_render->SetAttribute("cameraPos", camera->GetPosition());
 
     shader_flame_update->Use();
     shader_flame_update->SetAttribute("gTime", SceneStatus::current_time);
     shader_flame_update->SetAttribute("gDeltaTime", duration);
-    shader_flame_update->SetAttribute("gRadius", SceneStatus::flame_radius);
     shader_flame_update->SetAttribute("gLifespanMax", SceneStatus::flame_lifetime_max);
     shader_flame_update->SetAttribute("gLifespanMin", SceneStatus::flame_lifetime_min);
     shader_flame_update->SetAttribute("gVelocityMax", SceneStatus::flame_velocity_max);
     shader_flame_update->SetAttribute("gVelocityMin", SceneStatus::flame_velocity_min);
 
-    ResourceManager::shader_flame_render->Use();
-    ResourceManager::shader_flame_render->SetAttribute("view", view);
-    ResourceManager::shader_flame_render->SetAttribute("projection", projection);
-    ResourceManager::shader_flame_render->SetAttribute("cameraPos", camera->GetPosition());
+    shader_flame_render->Use();
+    shader_flame_render->SetAttribute("view", view);
+    shader_flame_render->SetAttribute("projection", projection);
+    shader_flame_render->SetAttribute("cameraPos", camera->GetPosition());
 
-    ResourceManager::shader_fountain_update->Use();
-    ResourceManager::shader_fountain_update->SetAttribute("gTime", SceneStatus::current_time);
-    ResourceManager::shader_fountain_update->SetAttribute("gDeltaTime", duration);
+    shader_fountain_update->Use();
+    shader_fountain_update->SetAttribute("gTime", SceneStatus::current_time);
+    shader_fountain_update->SetAttribute("gDeltaTime", duration);
+    shader_fountain_update->SetAttribute("gRadius", SceneStatus::fountain_radius);
+    shader_fountain_update->SetAttribute("gTheta", SceneStatus::fountain_theta);
+    shader_fountain_update->SetAttribute("gLifespanMax", SceneStatus::fountain_lifetime_max);
+    shader_fountain_update->SetAttribute("gLifespanMin", SceneStatus::fountain_lifetime_min);
 
-    ResourceManager::shader_fountain_render->Use();
-    ResourceManager::shader_fountain_render->SetAttribute("view", view);
-    ResourceManager::shader_fountain_render->SetAttribute("projection", projection);
-    ResourceManager::shader_fountain_render->SetAttribute("cameraPos", camera->GetPosition());
+    shader_fountain_render->Use();
+    shader_fountain_render->SetAttribute("view", view);
+    shader_fountain_render->SetAttribute("projection", projection);
+    shader_fountain_render->SetAttribute("cameraPos", camera->GetPosition());
 }

@@ -21,7 +21,7 @@ struct Flame {
 
 vector<Flame> Flame::GetLaunchers() {
     vector<Flame> launchers;
-    std::normal_distribution<float> dist(0, SceneStatus::flame_radius);
+    std::normal_distribution<float> dist(0, 0.1f);
     for(int i = 0; i < 10000; ++i) {
         launchers.push_back({
             .position = glm::vec3(dist(utils::generator()), 0.0f, dist(utils::generator())),

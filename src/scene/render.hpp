@@ -110,13 +110,21 @@ void GraphRender::KeyboardCallback(GLFWwindow* window_, int key, int scancode, i
 }
 
 void GraphRender::MouseMoveCallback(GLFWwindow* window_, double pos_x, double pos_y) {
+    static double last_x = 0.0, last_y = 0.0;
+    static bool is_first = true;
     if (mode == OperateMode::roaming) {
-        static double last_x = 0.0, last_y = 0.0;
+        if (is_first) {
+            last_x = pos_x;
+            last_y = pos_y;
+            is_first = false;
+        }
         double offset_x = pos_x - last_x;
         double offset_y = last_y - pos_y;
         camera->MouseMove((float)offset_x, (float)offset_y);
         last_x = pos_x;
         last_y = pos_y;
+    } else {
+        is_first = true;
     }
 }
 
@@ -183,7 +191,9 @@ void GraphRender::Render() {
         glfwPollEvents();
         KeyboardInput();
         Display();
-        GUI::Render();
+        if (mode == OperateMode::control) {
+            GUI::Render();
+        }
         glfwSwapBuffers(window);
         UpdateStateEnd();
     }
