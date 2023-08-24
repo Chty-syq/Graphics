@@ -13,3 +13,6 @@
 [submodule "third-party/poisson_disk_sampling"]
 	path = third-party/poisson_disk_sampling
 	url = https://github.com/thinks/poisson-disk-sampling.git
+[submodule "third-party/tbb"]
+	path = third-party/tbb
+	url = https://github.com/oneapi-src/oneTBB.git

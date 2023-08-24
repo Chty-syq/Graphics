@@ -1,6 +1,7 @@
 add_subdirectory(glad)
 add_subdirectory(assimp)
 add_subdirectory(poisson_disk_sampling)
+add_subdirectory(tbb)
 
 add_library(imgui STATIC
         imgui/imgui.cpp

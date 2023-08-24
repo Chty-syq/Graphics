@@ -9,6 +9,7 @@
 #include "framework/ray_tracing/material_metal.hpp"
 #include "framework/ray_tracing/material_dielectric.hpp"
 #include "framework/camera.hpp"
+#include "tbb/parallel_for.h"
 #include "common/utils.hpp"
 
 class Tracer {
@@ -91,9 +92,11 @@ void Tracer::Render() {
 
     auto time_start = std::chrono::high_resolution_clock::now();
 
-    int samples = 10;
-    for(int i = 0; i < height; ++i) {
-        for(int j = 0; j < width; ++j) {
+    int samples = 100;
+    tbb::parallel_for(tbb::blocked_range<int>(0, height * width, 10000), [&](tbb::blocked_range<int>& r) {
+        for(int index = r.begin(); index != r.end(); ++index) {
+            int i = index / width;
+            int j = index % width;
             auto color = glm::vec4(0.0f);
             for(int sps = 0; sps < samples; ++sps) {
                 float u = ((float)j + utils::RandomFloat(0, 1)) / (float)width;
@@ -106,7 +109,8 @@ void Tracer::Render() {
             color = glm::vec4(sqrt(color.x), sqrt(color.y), sqrt(color.z), color.w);  //gamma校正
             DrawPixel(i, j, color);
         }
-    }
+    });
+
     auto save_dir = fs::current_path().parent_path() / "result.png";
     stbi_flip_vertically_on_write(true);
     stbi_write_png(save_dir.c_str(), width, height, channel, image, width * channel);

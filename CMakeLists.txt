@@ -25,6 +25,7 @@ target_link_libraries(${PROJECT_NAME}
         assimp
         imgui
         thinks::poisson_disk_sampling
+        tbb
         $<$<BOOL:${UNIX}>:${X11_LIBRARIES}>     # libX11 for Unix
         $<$<BOOL:${UNIX}>:${CMAKE_DL_LIBS}>     # libdl for ubuntu
         )
