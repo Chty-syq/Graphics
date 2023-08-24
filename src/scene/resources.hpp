@@ -204,12 +204,12 @@ void ResourceManager::LoadShaders() {
 
 void ResourceManager::SetShaderProperties(const shared_ptr<Camera> &camera) {
     auto view = camera->GetViewMat();
-    auto projection = glm::perspective(glm::radians(camera->GetZoom()), (GLfloat)SCREEN_WIDTH / (GLfloat)SCREEN_HEIGHT, 0.1f, 100.0f);
+    auto projection = camera->GetPerspectiveMat();
     shader_object->Use();
     shader_object->SetAttribute("view", view);
     shader_object->SetAttribute("projection", projection);
-    shader_object->SetAttribute("fLightSpot.sDirection", camera->GetFront());
-    shader_object->SetAttribute("fLightSpot.sLightPoint.pPosition", camera->GetPosition());
+    shader_object->SetAttribute("fLightSpot.sDirection", camera->camera_front);
+    shader_object->SetAttribute("fLightSpot.sLightPoint.pPosition", camera->camera_pos);
     shader_object->SetAttribute("blinn", SceneStatus::blinn);
 
     shader_skybox->Use();
@@ -219,7 +219,7 @@ void ResourceManager::SetShaderProperties(const shared_ptr<Camera> &camera) {
     shader_billboard->Use();
     shader_billboard->SetAttribute("view", view);
     shader_billboard->SetAttribute("projection", projection);
-    shader_billboard->SetAttribute("cameraPos", camera->GetPosition());
+    shader_billboard->SetAttribute("cameraPos", camera->camera_pos);
 
     float duration = SceneStatus::GetDuration();
     shader_fireworks_update->Use();
@@ -232,7 +232,7 @@ void ResourceManager::SetShaderProperties(const shared_ptr<Camera> &camera) {
     shader_fireworks_render->Use();
     shader_fireworks_render->SetAttribute("view", view);
     shader_fireworks_render->SetAttribute("projection", projection);
-    shader_fireworks_render->SetAttribute("cameraPos", camera->GetPosition());
+    shader_fireworks_render->SetAttribute("cameraPos", camera->camera_pos);
 
     shader_flame_update->Use();
     shader_flame_update->SetAttribute("gTime", SceneStatus::current_time);
@@ -245,7 +245,7 @@ void ResourceManager::SetShaderProperties(const shared_ptr<Camera> &camera) {
     shader_flame_render->Use();
     shader_flame_render->SetAttribute("view", view);
     shader_flame_render->SetAttribute("projection", projection);
-    shader_flame_render->SetAttribute("cameraPos", camera->GetPosition());
+    shader_flame_render->SetAttribute("cameraPos", camera->camera_pos);
 
     shader_fountain_update->Use();
     shader_fountain_update->SetAttribute("gTime", SceneStatus::current_time);
@@ -258,5 +258,5 @@ void ResourceManager::SetShaderProperties(const shared_ptr<Camera> &camera) {
     shader_fountain_render->Use();
     shader_fountain_render->SetAttribute("view", view);
     shader_fountain_render->SetAttribute("projection", projection);
-    shader_fountain_render->SetAttribute("cameraPos", camera->GetPosition());
+    shader_fountain_render->SetAttribute("cameraPos", camera->camera_pos);
 }

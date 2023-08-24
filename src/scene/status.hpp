@@ -11,6 +11,7 @@ namespace SceneStatus {
     float current_time = 0.0f;
     int fps = 0;
 
+    //烟花参数
     float fireworks_lifetime_launcher = 1.0f;
     float fireworks_lifetime_shell = 1.0f;
     float fireworks_lifetime_sec_shell = 2.0f;

@@ -3,41 +3,66 @@
 //
 #pragma once
 
-#include <glad/glad.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <vector>
 #include <common/defs.hpp>
+#include "framework/ray_tracing/ray.hpp"
 
 class Camera {
 private:
-    glm::vec3 camera_pos;
-    glm::vec3 camera_front;
-    glm::vec3 camera_up;
-    glm::vec3 camera_right;
-    glm::vec3 world_up;
-    float pitch;
-    float yaw;
-    float zoom;
+    glm::vec3 lower_left_corner{};    //视锥左下角
+    glm::vec3 horizontal{};   //视锥平面水平方向跨度
+    glm::vec3 vertical{};     //视锥平面垂直方向跨度
     void UpdateState();
 
 public:
+    glm::vec3 camera_pos;
+    glm::vec3 camera_front{};
+    glm::vec3 camera_up{};
+    glm::vec3 camera_right{};
+    glm::vec3 world_up{};
+    float pitch;
+    float yaw;
+    float fov;      //视锥大小
+    float aspect;   //屏幕宽高比
+    float focus;    //焦距
     explicit Camera(glm::vec3 camera_pos);
-    auto GetViewMat();
-    auto GetZoom() const;
-    auto GetPosition() const;
-    auto GetFront() const;
+    Camera(glm::vec3 camera_pos, glm::vec3 target);
+    glm::mat4 GetViewMat() const;
+    glm::mat4 GetPerspectiveMat() const;
     void KeyboardInput(Direction direction, float duration);
     void MouseMove(float offset_x, float offset_y);
     void MouseScroll(float offset);
+    Ray GetRay(float s, float t);
 };
 
 Camera::Camera(glm::vec3 camera_pos): camera_pos(camera_pos) {
-    this->zoom = CAMERA_ZOOM;
+    this->fov = CAMERA_FOV;
+    this->aspect = (GLfloat)SCREEN_WIDTH / (GLfloat)SCREEN_HEIGHT;
     this->yaw = CAMERA_YAW;
     this->pitch = CAMERA_PITCH;
+    this->focus = CAMERA_FOCUS;
     this->world_up = glm::vec3(0.0f, 1.0f, 0.0f);
     this->UpdateState();
+}
+
+Camera::Camera(glm::vec3 camera_pos, glm::vec3 target): camera_pos(camera_pos) {
+    this->fov = CAMERA_FOV;
+    this->aspect = (GLfloat)SCREEN_WIDTH / (GLfloat)SCREEN_HEIGHT;
+    this->focus = CAMERA_FOCUS;
+    this->world_up = glm::vec3(0.0f, 1.0f, 0.0f);
+
+    camera_front = glm::normalize(camera_pos - target);
+    camera_right = glm::normalize(glm::cross(camera_front, world_up));
+    camera_up = glm::normalize(glm::cross(camera_right, camera_front));
+
+    float half_height = tan(glm::radians(fov * 0.5f));
+    float half_width = aspect * half_height;
+
+    lower_left_corner = camera_pos - half_width * camera_right - half_height * camera_up - camera_front;
+    horizontal = 2.0f * half_width * camera_right;
+    vertical = 2.0f * half_height * camera_up;
 }
 
 void Camera::UpdateState() {
@@ -47,6 +72,13 @@ void Camera::UpdateState() {
     camera_front = glm::normalize(camera_front);
     camera_right = glm::normalize(glm::cross(camera_front, world_up));
     camera_up = glm::normalize(glm::cross(camera_right, camera_front));
+
+    float half_height = tan(glm::radians(fov * 0.5f));
+    float half_width = aspect * half_height;
+
+    lower_left_corner = camera_pos - half_width * camera_right - half_height * camera_up - camera_front;
+    horizontal = 2.0f * half_width * camera_right;
+    vertical = 2.0f * half_height * camera_up;
 }
 
 void Camera::KeyboardInput(Direction direction, float duration) {
@@ -76,25 +108,19 @@ void Camera::MouseMove(float offset_x, float offset_y) {
 }
 
 void Camera::MouseScroll(float offset) {
-    zoom -= offset;
-    zoom = std::max(zoom, 1.0f);
-    zoom = std::min(zoom, 45.0f);
+    fov -= offset;
+    fov = std::max(fov, 1.0f);
+    fov = std::min(fov, 45.0f);
 }
 
-auto Camera::GetViewMat() {
+glm::mat4 Camera::GetViewMat() const {
     return glm::lookAt(camera_pos, camera_pos + camera_front, camera_up);
 }
 
-auto Camera::GetZoom() const {
-    return this->zoom;
+glm::mat4 Camera::GetPerspectiveMat() const {
+    return glm::perspective(glm::radians(fov), aspect, 0.1f, 100.0f);;
 }
 
-auto Camera::GetPosition() const {
-    return this->camera_pos;
+Ray Camera::GetRay(float s, float t) {
+    return { camera_pos, lower_left_corner + s * horizontal + t * vertical - camera_pos };
 }
-
-auto Camera::GetFront() const {
-    return this->camera_front;
-}
-
-
