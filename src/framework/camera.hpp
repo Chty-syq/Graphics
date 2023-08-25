@@ -7,7 +7,6 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <vector>
 #include <common/defs.hpp>
-#include "framework/ray_tracing/ray.hpp"
 
 class Camera {
 private:
@@ -34,7 +33,6 @@ public:
     void KeyboardInput(Direction direction, float duration);
     void MouseMove(float offset_x, float offset_y);
     void MouseScroll(float offset);
-    Ray GetRay(float s, float t);
 };
 
 Camera::Camera(glm::vec3 camera_pos): camera_pos(camera_pos) {
@@ -119,8 +117,4 @@ glm::mat4 Camera::GetViewMat() const {
 
 glm::mat4 Camera::GetPerspectiveMat() const {
     return glm::perspective(glm::radians(fov), aspect, 0.1f, 100.0f);;
-}
-
-Ray Camera::GetRay(float s, float t) {
-    return { camera_pos, lower_left_corner + s * horizontal + t * vertical - camera_pos };
 }

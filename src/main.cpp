@@ -1,13 +1,9 @@
-//#include "scene/render.hpp"
-//#include "scene/gui.hpp"
-#include "framework/ray_tracing/tracer.hpp"
+#include "scene/render.hpp"
+#include "scene/gui.hpp"
 
 int main() {
-//    GraphRender::Init();
-//    GUI::Init(GraphRender::window);
-//    GraphRender::Render();
-
-    Tracer tracer;
-    tracer.Render();
+    GraphRender::Init();
+    GUI::Init(GraphRender::window);
+    GraphRender::Render();
     return 0;
 }

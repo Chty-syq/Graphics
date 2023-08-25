@@ -9,7 +9,7 @@ find_package(OpenGL REQUIRED)
 add_subdirectory(third-party)
 
 file(GLOB_RECURSE source_files CONFIGURE_DEPENDS src/*.cpp src/*.hpp)
-add_executable(${PROJECT_NAME} ${source_files} src/common/utils.hpp)
+add_executable(${PROJECT_NAME} ${source_files})
 
 if(UNIX)
     find_package(X11 REQUIRED)

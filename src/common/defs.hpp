@@ -35,8 +35,8 @@ using IndiceArr = std::vector<GLuint>;
 
 const float PI = (float)acos(-1);
 
-const GLuint SCREEN_WIDTH = 800;
-const GLuint SCREEN_HEIGHT = 600;
+const GLuint SCREEN_WIDTH = 1920;
+const GLuint SCREEN_HEIGHT = 1080;
 
 const GLuint SHADOW_WIDTH = 1024;
 const GLuint SHADOW_HEIGHT = 1024;
