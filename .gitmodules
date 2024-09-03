@@ -16,3 +16,12 @@
 [submodule "third-party/tbb"]
 	path = third-party/tbb
 	url = https://github.com/oneapi-src/oneTBB.git
+[submodule "third-party/fmt"]
+	path = third-party/fmt
+	url = https://github.com/fmtlib/fmt.git
+[submodule "third-party/json"]
+	path = third-party/json
+	url = https://github.com/nlohmann/json.git
+[submodule "third-party/argparse"]
+	path = third-party/argparse
+	url = https://github.com/p-ranav/argparse.git
