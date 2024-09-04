@@ -25,3 +25,6 @@
 [submodule "third-party/argparse"]
 	path = third-party/argparse
 	url = https://github.com/p-ranav/argparse.git
+[submodule "third-party/patterns"]
+	path = third-party/patterns
+	url = https://github.com/mpark/patterns.git

@@ -11,12 +11,12 @@ add_subdirectory(third-party)
 file(GLOB_RECURSE source_files CONFIGURE_DEPENDS src/*.cpp src/*.hpp)
 add_executable(${PROJECT_NAME} ${source_files})
 
-if(UNIX)
+if (UNIX)
     find_package(X11 REQUIRED)
     message(STATUS "X11_FOUND = ${X11_FOUND}")
     message(STATUS "X11_INCLUDE_DIR = ${X11_INCLUDE_DIR}")
     message(STATUS "X11_LIBRARIES = ${X11_LIBRARIES}")
-endif()
+endif ()
 
 target_link_libraries(${PROJECT_NAME}
         glad
@@ -26,6 +26,7 @@ target_link_libraries(${PROJECT_NAME}
         imgui
         thinks::poisson_disk_sampling
         tbb
+        mpark_patterns
         $<$<BOOL:${UNIX}>:${X11_LIBRARIES}>     # libX11 for Unix
         $<$<BOOL:${UNIX}>:${CMAKE_DL_LIBS}>     # libdl for ubuntu
         )

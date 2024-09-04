@@ -2,17 +2,20 @@
 // Created by syq on 23-7-7.
 //
 #pragma once
+
 #include <stdexcept>
 #include <map>
 #include <queue>
-#include "framework/texture.hpp"
+//#include "framework/texture.hpp"
+#include "framework/textures/texture_2d.hpp"
+#include "framework/textures/texture_cube.hpp"
 #include "scene/status.hpp"
 #include "common/structs.hpp"
 #include "common/defs.hpp"
 
 
 namespace ResourceManager {
-    std::map<std::string, shared_ptr<Texture2D>> textures;
+    std::map<std::string, shared_ptr<TextureBase>> textures;
     shared_ptr<Shader> shader_object;
     shared_ptr<Shader> shader_skybox;
     shared_ptr<Shader> shader_screen;
@@ -32,14 +35,21 @@ namespace ResourceManager {
     void Init();
 
     void LoadTexture(const std::string &path);
+
     void LoadTexture(const std::string &path, const std::string &name);
+
     void LoadTextures(const std::string &directory);
+
     void LoadTextureCube(const std::string &directory);
+
     void BindTexture(const std::string &name, int index);
-    shared_ptr<Texture2D> GetTexture(const std::string &name);
+
+    shared_ptr<TextureBase> GetTexture(const std::string &name);
 
     void LoadLights();
+
     void LoadShaders();
+
     void SetShaderProperties(const shared_ptr<Camera> &camera);
 };
 
@@ -59,17 +69,17 @@ void ResourceManager::LoadTexture(const std::string &path) {
 
 void ResourceManager::LoadTexture(const std::string &path, const std::string &name) {
     if (textures.contains(name)) return;
-    auto texture = std::make_shared<Texture2D>(vector{path});
+    auto texture = std::make_shared<Texture2D>(path);
     textures.insert(std::make_pair(name, texture));
 }
 
 void ResourceManager::LoadTextures(const std::string &directory) {
     std::queue<std::string> directories;
     directories.push(directory);
-    while(!directories.empty()) {
+    while (!directories.empty()) {
         auto node = directories.back();
         directories.pop();
-        for(const auto& entry: fs::directory_iterator(node)) {
+        for (const auto &entry: fs::directory_iterator(node)) {
             if (fs::is_directory(entry)) {
                 directories.push(entry.path());
             } else {
@@ -89,11 +99,11 @@ void ResourceManager::LoadTextureCube(const std::string &directory) {
             directory + "/front.jpg",
             directory + "/back.jpg",
     };
-    auto texture = std::make_shared<Texture2D>(paths, GL_TEXTURE_CUBE_MAP, false);
+    auto texture = std::make_shared<TextureCube>(paths, false);
     textures.insert(std::make_pair(name, texture));
 }
 
-shared_ptr<Texture2D> ResourceManager::GetTexture(const std::string &name) {
+shared_ptr<TextureBase> ResourceManager::GetTexture(const std::string &name) {
     return textures[name];
 }
 
@@ -107,31 +117,31 @@ void ResourceManager::BindTexture(const std::string &name, int index) {
 
 void ResourceManager::LoadLights() {
     light_paral = {
-        glm::vec3(-0.2f, -1.0f, -0.3f),{
-            glm::vec3(0.05f, 0.05f, 0.05f),
-            glm::vec3(0.4f, 0.4f, 0.4f),
-            glm::vec3(0.5f, 0.5f, 0.5f)
-        }
+            glm::vec3(-0.2f, -1.0f, -0.3f), {
+                    glm::vec3(0.05f, 0.05f, 0.05f),
+                    glm::vec3(0.4f, 0.4f, 0.4f),
+                    glm::vec3(0.5f, 0.5f, 0.5f)
+            }
     };
     LightFactor factor = {
-        glm::vec3(0.05f, 0.05f, 0.05f),
-        glm::vec3(0.8f, 0.8f, 0.8f),
-        glm::vec3(1.0f, 1.0f, 1.0f)
+            glm::vec3(0.05f, 0.05f, 0.05f),
+            glm::vec3(0.8f, 0.8f, 0.8f),
+            glm::vec3(1.0f, 1.0f, 1.0f)
     };
     auto coefficient = glm::vec3(1.0f, 0.09f, 0.032f);
-    light_points.push_back({glm::vec3(0.7f,  4.2f,  2.0f), coefficient, factor});
+    light_points.push_back({glm::vec3(0.7f, 4.2f, 2.0f), coefficient, factor});
     light_points.push_back({glm::vec3(2.3f, 3.3f, -4.0f), coefficient, factor});
-    light_points.push_back({glm::vec3(-4.0f,  2.0f, -12.0f), coefficient, factor});
-    light_points.push_back({glm::vec3(0.0f,  1.0f, -3.0f), coefficient, factor});
+    light_points.push_back({glm::vec3(-4.0f, 2.0f, -12.0f), coefficient, factor});
+    light_points.push_back({glm::vec3(0.0f, 1.0f, -3.0f), coefficient, factor});
     light_spot = {
-        glm::cos(glm::radians(12.5f)),
-        glm::cos(glm::radians(17.5f)),{
-            glm::vec3(0.0f),
-            coefficient,{
-                glm::vec3(0.0f, 0.0f, 0.0f),
-                glm::vec3(1.0f, 1.0f, 1.0f),
-                glm::vec3(1.0f, 1.0f, 1.0f)
-                }}
+            glm::cos(glm::radians(12.5f)),
+            glm::cos(glm::radians(17.5f)), {
+                    glm::vec3(0.0f),
+                    coefficient, {
+                            glm::vec3(0.0f, 0.0f, 0.0f),
+                            glm::vec3(1.0f, 1.0f, 1.0f),
+                            glm::vec3(1.0f, 1.0f, 1.0f)
+                    }}
     };
 }
 
@@ -170,33 +180,40 @@ void ResourceManager::LoadShaders() {
     shader_billboard->SetAttribute("fTexture", 0);
     shader_billboard->SetAttribute("size", 0.3f);
 
-    shader_fireworks_update = std::make_shared<Shader>(fs::current_path().parent_path() / "shaders" / "particles" / "fireworks" / "update");
+    shader_fireworks_update = std::make_shared<Shader>(
+            fs::current_path().parent_path() / "shaders" / "particles" / "fireworks" / "update");
     shader_fireworks_update->Use();
     shader_fireworks_update->SetTFOVarying({"fPosition", "fVelocity", "fColor", "fType", "fLifetime", "fTag"});
     shader_fireworks_update->SetAttribute("gRandomMap", 0);
 
-    shader_fireworks_render = std::make_shared<Shader>(fs::current_path().parent_path() / "shaders" / "particles" / "fireworks" / "render");
+    shader_fireworks_render = std::make_shared<Shader>(
+            fs::current_path().parent_path() / "shaders" / "particles" / "fireworks" / "render");
     shader_fireworks_render->Use();
     shader_fireworks_render->SetAttribute("fTexture", 0);
     shader_fireworks_render->SetAttribute("size", 0.3f);
 
-    shader_flame_update = std::make_shared<Shader>(fs::current_path().parent_path() / "shaders" / "particles" / "flame" / "update");
+    shader_flame_update = std::make_shared<Shader>(
+            fs::current_path().parent_path() / "shaders" / "particles" / "flame" / "update");
     shader_flame_update->Use();
-    shader_flame_update->SetTFOVarying({"fPosition", "fVelocity", "fAlpha", "fType", "fSize", "fLifetime", "fLifespan"});
+    shader_flame_update->SetTFOVarying(
+            {"fPosition", "fVelocity", "fAlpha", "fType", "fSize", "fLifetime", "fLifespan"});
     shader_flame_update->SetAttribute("gRandomMap", 0);
 
-    shader_flame_render = std::make_shared<Shader>(fs::current_path().parent_path() / "shaders" / "particles" / "flame" / "render");
+    shader_flame_render = std::make_shared<Shader>(
+            fs::current_path().parent_path() / "shaders" / "particles" / "flame" / "render");
     shader_flame_render->Use();
     shader_flame_render->SetAttribute("fFlameStart", 0);
     shader_flame_render->SetAttribute("fFlameSpark", 1);
 
-    shader_fountain_update = std::make_shared<Shader>(fs::current_path().parent_path() / "shaders" / "particles" / "fountain" / "update");
+    shader_fountain_update = std::make_shared<Shader>(
+            fs::current_path().parent_path() / "shaders" / "particles" / "fountain" / "update");
     shader_fountain_update->Use();
     shader_fountain_update->SetTFOVarying({"fPosition", "fVelocity", "fType", "fLifetime"});
     shader_fountain_update->SetAttribute("gNormal", glm::vec3(0.0f, 1.0f, 0.0f));
     shader_fountain_update->SetAttribute("gRandomMap", 0);
 
-    shader_fountain_render = std::make_shared<Shader>(fs::current_path().parent_path() / "shaders" / "particles" / "fountain" / "render");
+    shader_fountain_render = std::make_shared<Shader>(
+            fs::current_path().parent_path() / "shaders" / "particles" / "fountain" / "render");
     shader_fountain_render->Use();
     shader_fountain_render->SetAttribute("fTexture", 0);
     shader_fountain_render->SetAttribute("size", 0.3f);

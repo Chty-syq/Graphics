@@ -4,6 +4,7 @@
 #pragma once
 #define STB_IMAGE_IMPLEMENTATION
 #define STB_IMAGE_WRITE_IMPLEMENTATION
+
 #include <GLFW/glfw3.h>
 #include <cstdio>
 #include <memory>
@@ -13,6 +14,7 @@
 #include <filesystem>
 #include <stb_image.h>
 #include <stb_image_write.h>
+#include <mpark/patterns.hpp>
 #include "glm/glm.hpp"
 #include "glm/gtc/type_ptr.hpp"
 #include "glm/gtc/matrix_transform.hpp"
@@ -21,6 +23,7 @@
 #include "common/structs.hpp"
 
 namespace fs = std::filesystem;
+namespace mp = mpark::patterns;
 
 using std::cin;
 using std::cout;
@@ -33,7 +36,7 @@ using std::shared_ptr;
 using VertexArr = std::vector<Vertex>;
 using IndiceArr = std::vector<GLuint>;
 
-const float PI = (float)acos(-1);
+const float PI = (float) acos(-1);
 
 const GLuint SCREEN_WIDTH = 1920;
 const GLuint SCREEN_HEIGHT = 1080;
